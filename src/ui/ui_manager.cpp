@@ -51,6 +51,28 @@ void UiManager::BeginDockSpace()
 	ImGui::Begin("DockSpace_Window", &dockSpaceOpen, windowFlags);
 
 	// Update toolbar here if implemented
+	if (ImGui::BeginTabBar("tabs"))
+	{
+		if (ImGui::BeginTabItem("overview"))
+		{
+			activeTab_ = 0;
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("assets"))
+		{
+			activeTab_ = 1;
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("insights"))
+		{
+			activeTab_ = 2;
+			ImGui::EndTabItem();
+		}
+
+		ImGui::EndTabBar();
+	}
 
 	if (optionFullScreenPersistant)
 		ImGui::PopStyleVar(3);

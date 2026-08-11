@@ -9,6 +9,7 @@ class UiManager
 {
 private:
 	std::unordered_set<Window*> windows_;
+	int activeTab_ = 0;
 
 private:
 	UiManager() = default;
