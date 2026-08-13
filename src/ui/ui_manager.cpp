@@ -19,8 +19,8 @@ UiManager& UiManager::GetInstance()
 
 void UiManager::Init()
 {
-	windows_.insert(new OverviewWindow("Overview"));
-	windows_.insert(new EntryWindow("Entry"));
+	CreateWindow<OverviewWindow>("Overview");
+	CreateWindow<EntryWindow>("Entry");
 }
 
 void UiManager::BeginDockSpace()
@@ -97,11 +97,11 @@ void UiManager::BeginDockSpace()
 
 		// Create dockspace layout here
 		ImGuiID dockIdLeft, dockIdRight;
-		ImGui::DockBuilderSplitNode(dockspaceId, ImGuiDir_Left, 0.7f, &dockIdLeft, &dockIdRight);
+		ImGui::DockBuilderSplitNode(dockspaceId, ImGuiDir_Left, 0.65f, &dockIdLeft, &dockIdRight);
 
 		// Setup dockspace here
-		ImGui::DockBuilderDockWindow(GetWindowByName("Overview")->GetName().c_str(), dockIdLeft);
-		ImGui::DockBuilderDockWindow(GetWindowByName("Entry")->GetName().c_str(), dockIdRight);
+		ImGui::DockBuilderDockWindow(windows_.at("Overview")->GetName().c_str(), dockIdLeft);
+		ImGui::DockBuilderDockWindow(windows_.at("Entry")->GetName().c_str(), dockIdRight);
 
 		ImGui::DockBuilderFinish(dockspaceId);
 	}
@@ -114,18 +114,21 @@ void UiManager::EndDockSpace()
 }
 
 void UiManager::UpdateWindows()
-{
-	for (const auto& window : windows_)
-		window->Update();
-}
-
-Window* UiManager::GetWindowByName(const std::string& _name) const
-{
-	for (Window* window : windows_)
+{	
+	switch (activeTab_)
 	{
-		if (window->GetName() == _name)
-			return window;
-	}
+	case 0:
+		windows_.at("Overview")->Update();
+		windows_.at("Entry")->Update();
+		break;
+	
+	case 1:
+		break;
 
-	return nullptr;
-};
+	case 2:
+		break;
+
+	default:
+		break;
+	}
+}
