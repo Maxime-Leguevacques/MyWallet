@@ -19,6 +19,9 @@ add_library(imgui
 
     external/imgui/backends/imgui_impl_glfw.cpp
     external/imgui/backends/imgui_impl_opengl3.cpp
+
+    external/imgui/implot.cpp
+    external/imgui/implot_items.cpp
 )
 
 target_include_directories(imgui PUBLIC
@@ -39,7 +42,8 @@ add_executable(MyWallet
     src/app.cpp
     src/ui/ui_manager.cpp
     src/ui/window.cpp
-    src/ui/windows/dashboard_window.cpp
+    src/ui/windows/overview_window.cpp
+    src/ui/windows/entry_window.cpp
 )
 
 

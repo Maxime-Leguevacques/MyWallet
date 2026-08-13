@@ -7,7 +7,8 @@
 #include "backends/imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "ui/windows/dashboard_window.h"
+#include "ui/windows/overview_window.h"
+#include "ui/windows/entry_window.h"
 
 
 UiManager& UiManager::GetInstance()
@@ -18,11 +19,14 @@ UiManager& UiManager::GetInstance()
 
 void UiManager::Init()
 {
-	windows_.insert(new DashboardWindow("MyDashboard"));
+	windows_.insert(new OverviewWindow("Overview"));
+	windows_.insert(new EntryWindow("Entry"));
 }
 
 void UiManager::BeginDockSpace()
 {
+	std::cout << "current tab: " << activeTab_ << std::endl;
+
 #pragma region setup_dockspace
 	bool dockSpaceOpen = true;
 	constexpr bool optionFullScreenPersistant = true;
@@ -53,7 +57,7 @@ void UiManager::BeginDockSpace()
 	// Update toolbar here if implemented
 	if (ImGui::BeginTabBar("tabs"))
 	{
-		if (ImGui::BeginTabItem("overview"))
+		if (ImGui::BeginTabItem("dashboard"))
 		{
 			activeTab_ = 0;
 			ImGui::EndTabItem();
@@ -84,7 +88,7 @@ void UiManager::BeginDockSpace()
 	// Dock control space
 	static bool isInit = false;
 	if (!isInit)
-	{
+	{	
 		isInit = true;
 
 		ImGui::DockBuilderRemoveNode(dockspaceId);
@@ -92,9 +96,12 @@ void UiManager::BeginDockSpace()
 		ImGui::DockBuilderSetNodeSize(dockspaceId, ImGui::GetMainViewport()->Size);
 
 		// Create dockspace layout here
+		ImGuiID dockIdLeft, dockIdRight;
+		ImGui::DockBuilderSplitNode(dockspaceId, ImGuiDir_Left, 0.7f, &dockIdLeft, &dockIdRight);
 
 		// Setup dockspace here
-		ImGui::DockBuilderDockWindow(GetWindowByName("MyDashboard")->GetName().c_str(), dockspaceId);
+		ImGui::DockBuilderDockWindow(GetWindowByName("Overview")->GetName().c_str(), dockIdLeft);
+		ImGui::DockBuilderDockWindow(GetWindowByName("Entry")->GetName().c_str(), dockIdRight);
 
 		ImGui::DockBuilderFinish(dockspaceId);
 	}

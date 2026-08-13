@@ -6,6 +6,7 @@
 #include "imgui_internal.h"
 #include "backends/imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "implot.h"
 
 #include "ui/ui_manager.h"
 
@@ -147,7 +148,7 @@ void App::Init()
 	// Setup ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	//ImPlot::CreateContext();
+	ImPlot::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.IniFilename = nullptr;    // Erase previous potentially saved configs
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -213,7 +214,6 @@ void App::Run()
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
-	//ImPlot::DestroyContext();
 	ImGui::DestroyContext();
 	glfwTerminate();
 }
