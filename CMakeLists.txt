@@ -44,6 +44,8 @@ add_executable(MyWallet
     src/ui/window.cpp
     src/ui/windows/overview_window.cpp
     src/ui/windows/entry_window.cpp
+    src/ui/windows/asset_list_window.cpp
+    src/ui/windows/asset_stats_window.cpp
 )
 
 

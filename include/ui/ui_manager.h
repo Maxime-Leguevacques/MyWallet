@@ -16,13 +16,6 @@ private:
 	UiManager() = default;
 	~UiManager() = default;
 
-public:
-	UiManager(const UiManager&) = delete;
-	UiManager& operator=(const UiManager&) = delete;
-	static UiManager& GetInstance();
-
-	void Init();
-
 	void BeginDockSpace();
 	void EndDockSpace();
 	void UpdateWindows();
@@ -33,6 +26,12 @@ public:
 		static_assert(std::is_base_of_v<Window, T>, "T must derive from window");
 		windows_.emplace(_name, std::make_unique<T>(_name));
 	}
-	
-	Window* GetWindowByName(const std::string& _name) const;
+
+public:
+	UiManager(const UiManager&) = delete;
+	UiManager& operator=(const UiManager&) = delete;
+	static UiManager& GetInstance();
+
+	void Init();
+	void Update();
 };

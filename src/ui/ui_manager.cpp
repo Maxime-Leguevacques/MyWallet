@@ -9,24 +9,12 @@
 
 #include "ui/windows/overview_window.h"
 #include "ui/windows/entry_window.h"
+#include "ui/windows/asset_list_window.h"
+#include "ui/windows/asset_stats_window.h"
 
-
-UiManager& UiManager::GetInstance()
-{
-	static UiManager instance;
-	return instance;
-}
-
-void UiManager::Init()
-{
-	CreateWindow<OverviewWindow>("Overview");
-	CreateWindow<EntryWindow>("Entry");
-}
 
 void UiManager::BeginDockSpace()
 {
-	std::cout << "current tab: " << activeTab_ << std::endl;
-
 #pragma region setup_dockspace
 	bool dockSpaceOpen = true;
 	constexpr bool optionFullScreenPersistant = true;
@@ -103,6 +91,9 @@ void UiManager::BeginDockSpace()
 		ImGui::DockBuilderDockWindow(windows_.at("Overview")->GetName().c_str(), dockIdLeft);
 		ImGui::DockBuilderDockWindow(windows_.at("Entry")->GetName().c_str(), dockIdRight);
 
+		ImGui::DockBuilderDockWindow(windows_.at("Asset List")->GetName().c_str(), dockIdLeft);
+		ImGui::DockBuilderDockWindow(windows_.at("Asset Stats")->GetName().c_str(), dockIdRight);
+
 		ImGui::DockBuilderFinish(dockspaceId);
 	}
 #pragma endregion Create_dockspace
@@ -123,6 +114,8 @@ void UiManager::UpdateWindows()
 		break;
 	
 	case 1:
+		windows_.at("Asset List")->Update();
+		windows_.at("Asset Stats")->Update();
 		break;
 
 	case 2:
@@ -132,3 +125,26 @@ void UiManager::UpdateWindows()
 		break;
 	}
 }
+
+UiManager& UiManager::GetInstance()
+{
+	static UiManager instance;
+	return instance;
+}
+
+void UiManager::Init()
+{
+	CreateWindow<OverviewWindow>("Overview");
+	CreateWindow<EntryWindow>("Entry");
+	CreateWindow<AssetListWindow>("Asset List");
+	CreateWindow<AssetStatsWindow>("Asset Stats");
+}
+
+void UiManager::Update()
+{
+	BeginDockSpace();
+	UpdateWindows();
+	EndDockSpace();
+}
+
+

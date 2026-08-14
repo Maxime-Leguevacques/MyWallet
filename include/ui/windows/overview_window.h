@@ -5,6 +5,10 @@
 
 class OverviewWindow : public Window
 {
+private:
+	void UpdatePortfolioAssetChart();
+	void UpdatePortfolioGrowthChart();
+
 public:
 	OverviewWindow(const std::string& _name);
 

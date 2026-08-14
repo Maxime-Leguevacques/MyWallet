@@ -194,9 +194,7 @@ void App::Run()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		UiManager::GetInstance().BeginDockSpace();
-		UiManager::GetInstance().UpdateWindows();
-		UiManager::GetInstance().EndDockSpace();
+		UiManager::GetInstance().Update();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
