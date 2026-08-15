@@ -40,7 +40,7 @@ void UiManager::BeginDockSpace()
 	}
 #pragma endregion Setup_dockspace
 
-	ImGui::Begin("DockSpace_Window", &dockSpaceOpen, windowFlags);
+	ImGui::Begin("DockSpaceWindow", &dockSpaceOpen, windowFlags);
 
 	// Update toolbar here if implemented
 	if (ImGui::BeginTabBar("tabs"))
@@ -70,31 +70,30 @@ void UiManager::BeginDockSpace()
 		ImGui::PopStyleVar(3);
 
 #pragma region Create_dockspace
-	const ImGuiID dockspaceId = ImGui::GetID("DockSpace");
-	ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockSpaceFlags);
-
+	switch (activeTab_)
+	{
+	case 0:
+		ImGui::DockSpace(ImGui::GetID("DashboardDockSpace"), ImVec2(0.0f, 0.0f), dockSpaceFlags);
+		break;
+	case 1:
+		ImGui::DockSpace(ImGui::GetID("AssetDockSpace"), ImVec2(0.0f, 0.0f), dockSpaceFlags);
+		break;
+	case 2:
+		ImGui::DockSpace(ImGui::GetID("InsightsDockSpace"), ImVec2(0.0f, 0.0f), dockSpaceFlags);
+		break;
+	default:
+		ImGui::DockSpace(ImGui::GetID("DashboardDockSpace"), ImVec2(0.0f, 0.0f), dockSpaceFlags);
+		break;
+	}
+	
 	// Dock control space
 	static bool isInit = false;
 	if (!isInit)
 	{	
 		isInit = true;
-
-		ImGui::DockBuilderRemoveNode(dockspaceId);
-		ImGui::DockBuilderAddNode(dockspaceId);
-		ImGui::DockBuilderSetNodeSize(dockspaceId, ImGui::GetMainViewport()->Size);
-
-		// Create dockspace layout here
-		ImGuiID dockIdLeft, dockIdRight;
-		ImGui::DockBuilderSplitNode(dockspaceId, ImGuiDir_Left, 0.65f, &dockIdLeft, &dockIdRight);
-
-		// Setup dockspace here
-		ImGui::DockBuilderDockWindow(windows_.at("Overview")->GetName().c_str(), dockIdLeft);
-		ImGui::DockBuilderDockWindow(windows_.at("Entry")->GetName().c_str(), dockIdRight);
-
-		ImGui::DockBuilderDockWindow(windows_.at("Asset List")->GetName().c_str(), dockIdLeft);
-		ImGui::DockBuilderDockWindow(windows_.at("Asset Stats")->GetName().c_str(), dockIdRight);
-
-		ImGui::DockBuilderFinish(dockspaceId);
+		
+		SetupDashboardDockSpace();
+		SetupAssetDockSpace();
 	}
 #pragma endregion Create_dockspace
 }
@@ -112,18 +111,50 @@ void UiManager::UpdateWindows()
 		windows_.at("Overview")->Update();
 		windows_.at("Entry")->Update();
 		break;
-	
 	case 1:
 		windows_.at("Asset List")->Update();
 		windows_.at("Asset Stats")->Update();
 		break;
-
 	case 2:
 		break;
-
 	default:
 		break;
 	}
+}
+
+void UiManager::SetupDashboardDockSpace()
+{
+	const ImGuiID dashboardId = ImGui::GetID("DashboardDockSpace");
+	ImGui::DockBuilderRemoveNode(dashboardId);
+	ImGui::DockBuilderAddNode(dashboardId);
+	ImGui::DockBuilderSetNodeSize(dashboardId, ImGui::GetMainViewport()->Size);
+
+	ImGuiID id1, id2;
+	ImGui::DockBuilderSplitNode(dashboardId, ImGuiDir_Left, 0.65f, &id1, &id2);		// left and right
+	ImGui::DockBuilderDockWindow(windows_.at("Overview")->GetName().c_str(), id1);
+	ImGui::DockBuilderDockWindow(windows_.at("Entry")->GetName().c_str(), id2);
+	
+	ImGui::DockBuilderFinish(dashboardId);
+}
+
+void UiManager::SetupAssetDockSpace()
+{
+	const ImGuiID assetId = ImGui::GetID("AssetDockSpace");
+	ImGui::DockBuilderRemoveNode(assetId);
+	ImGui::DockBuilderAddNode(assetId);
+	ImGui::DockBuilderSetNodeSize(assetId, ImGui::GetMainViewport()->Size);
+
+	ImGuiID id1, id2;
+	ImGui::DockBuilderSplitNode(assetId, ImGuiDir_Left, 0.5f, &id1, &id2);		// left and right
+	ImGui::DockBuilderDockWindow(windows_.at("Asset List")->GetName().c_str(), id1);
+	ImGui::DockBuilderDockWindow(windows_.at("Asset Stats")->GetName().c_str(), id2);
+
+	ImGui::DockBuilderFinish(assetId);
+}
+
+void UiManager::SetupInsightsDockSpace()
+{
+
 }
 
 UiManager& UiManager::GetInstance()

@@ -27,6 +27,10 @@ private:
 		windows_.emplace(_name, std::make_unique<T>(_name));
 	}
 
+	void SetupDashboardDockSpace();
+	void SetupAssetDockSpace();
+	void SetupInsightsDockSpace();
+
 public:
 	UiManager(const UiManager&) = delete;
 	UiManager& operator=(const UiManager&) = delete;
