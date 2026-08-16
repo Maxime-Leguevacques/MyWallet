@@ -11,7 +11,6 @@ Wallet& Wallet::GetInstance()
 
 void Wallet::AddNewAsset()
 {
-	std::cout << "added new asset" << std::endl;
 	Asset newAsset;
 	assets_.push_back(newAsset);
 }
