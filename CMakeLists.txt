@@ -40,6 +40,7 @@ find_package(OpenGL REQUIRED)
 add_executable(MyWallet
     src/main.cpp
     src/app.cpp
+    src/wallet.cpp
     src/ui/ui_manager.cpp
     src/ui/window.cpp
     src/ui/windows/overview_window.cpp

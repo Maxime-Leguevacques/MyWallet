@@ -15,7 +15,6 @@
 
 void UiManager::BeginDockSpace()
 {
-#pragma region setup_dockspace
 	bool dockSpaceOpen = true;
 	constexpr bool optionFullScreenPersistant = true;
 
@@ -38,7 +37,6 @@ void UiManager::BeginDockSpace()
 		windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 		windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
 	}
-#pragma endregion Setup_dockspace
 
 	ImGui::Begin("DockSpaceWindow", &dockSpaceOpen, windowFlags);
 
@@ -69,7 +67,6 @@ void UiManager::BeginDockSpace()
 	if (optionFullScreenPersistant)
 		ImGui::PopStyleVar(3);
 
-#pragma region Create_dockspace
 	switch (activeTab_)
 	{
 	case 0:
@@ -86,7 +83,6 @@ void UiManager::BeginDockSpace()
 		break;
 	}
 	
-	// Dock control space
 	static bool isInit = false;
 	if (!isInit)
 	{	
@@ -95,7 +91,6 @@ void UiManager::BeginDockSpace()
 		SetupDashboardDockSpace();
 		SetupAssetDockSpace();
 	}
-#pragma endregion Create_dockspace
 }
 
 void UiManager::EndDockSpace()
@@ -124,32 +119,32 @@ void UiManager::UpdateWindows()
 
 void UiManager::SetupDashboardDockSpace()
 {
-	const ImGuiID dashboardId = ImGui::GetID("DashboardDockSpace");
-	ImGui::DockBuilderRemoveNode(dashboardId);
-	ImGui::DockBuilderAddNode(dashboardId);
-	ImGui::DockBuilderSetNodeSize(dashboardId, ImGui::GetMainViewport()->Size);
+	const ImGuiID dockspaceId = ImGui::GetID("DashboardDockSpace");
+	ImGui::DockBuilderRemoveNode(dockspaceId);
+	ImGui::DockBuilderAddNode(dockspaceId);
+	ImGui::DockBuilderSetNodeSize(dockspaceId, ImGui::GetMainViewport()->Size);
 
 	ImGuiID id1, id2;
-	ImGui::DockBuilderSplitNode(dashboardId, ImGuiDir_Left, 0.65f, &id1, &id2);		// left and right
+	ImGui::DockBuilderSplitNode(dockspaceId, ImGuiDir_Left, 0.65f, &id1, &id2);		// left and right
 	ImGui::DockBuilderDockWindow(windows_.at("Overview")->GetName().c_str(), id1);
 	ImGui::DockBuilderDockWindow(windows_.at("Entry")->GetName().c_str(), id2);
 	
-	ImGui::DockBuilderFinish(dashboardId);
+	ImGui::DockBuilderFinish(dockspaceId);
 }
 
 void UiManager::SetupAssetDockSpace()
 {
-	const ImGuiID assetId = ImGui::GetID("AssetDockSpace");
-	ImGui::DockBuilderRemoveNode(assetId);
-	ImGui::DockBuilderAddNode(assetId);
-	ImGui::DockBuilderSetNodeSize(assetId, ImGui::GetMainViewport()->Size);
+	const ImGuiID dockspaceId = ImGui::GetID("AssetDockSpace");
+	ImGui::DockBuilderRemoveNode(dockspaceId);
+	ImGui::DockBuilderAddNode(dockspaceId);
+	ImGui::DockBuilderSetNodeSize(dockspaceId, ImGui::GetMainViewport()->Size);
 
 	ImGuiID id1, id2;
-	ImGui::DockBuilderSplitNode(assetId, ImGuiDir_Left, 0.5f, &id1, &id2);		// left and right
+	ImGui::DockBuilderSplitNode(dockspaceId, ImGuiDir_Left, 0.5f, &id1, &id2);		// left and right
 	ImGui::DockBuilderDockWindow(windows_.at("Asset List")->GetName().c_str(), id1);
 	ImGui::DockBuilderDockWindow(windows_.at("Asset Stats")->GetName().c_str(), id2);
 
-	ImGui::DockBuilderFinish(assetId);
+	ImGui::DockBuilderFinish(dockspaceId);
 }
 
 void UiManager::SetupInsightsDockSpace()
@@ -169,6 +164,9 @@ void UiManager::Init()
 	CreateWindow<EntryWindow>("Entry");
 	CreateWindow<AssetListWindow>("Asset List");
 	CreateWindow<AssetStatsWindow>("Asset Stats");
+
+	//SetupDashboardDockSpace();
+	//SetupAssetDockSpace();
 }
 
 void UiManager::Update()
