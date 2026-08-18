@@ -20,6 +20,8 @@ add_library(imgui
     external/imgui/backends/imgui_impl_glfw.cpp
     external/imgui/backends/imgui_impl_opengl3.cpp
 
+    external/imgui/misc/cpp/imgui_stdlib.cpp
+
     external/imgui/implot.cpp
     external/imgui/implot_items.cpp
 )

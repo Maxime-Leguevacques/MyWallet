@@ -175,5 +175,3 @@ void UiManager::Update()
 	UpdateWindows();
 	EndDockSpace();
 }
-
-
