@@ -30,9 +30,7 @@ void AssetListWindow::NewAssetSectionUpdate()
 	if (!creatingNewAsset_)
 	{
 		if (ImGui::Button("new asset"))
-		{
 			creatingNewAsset_ = true;
-		}
 	}
 	else
 	{
@@ -49,18 +47,38 @@ void AssetListWindow::NewAssetSectionUpdate()
 			Asset asset;
 			newAsset_ = asset;
 		}
+
 		ImGui::SameLine();
+		
 		if (ImGui::Button("save"))
-			int a;
+		{
+			wallet_->AddNewAsset(newAsset_);
+			Asset asset;
+			newAsset_ = asset;
+		}
 	}
 }
 
 void AssetListWindow::AssetListUpdate()
 {
+	int assetToDelete = -1;
+
 	const std::vector<Asset>& assets = wallet_->GetAssets();
-	for (const Asset asset : assets)
+	for (int i = 0; i < assets.size(); i++)
 	{
-		ImGui::Text("asset");
+		ImGui::Text("%s", assets[i].name.c_str());
+		ImGui::Text("%s", assets[i].isin.c_str());
+		ImGui::Text("%s", assets[i].ticker.c_str());
+		ImGui::Text("%s", assets[i].broker.c_str());
+		
+		ImGui::PushID(i);
+		if (ImGui::Button("X"))
+			assetToDelete = i;
+		ImGui::PopID();
+
 		ImGui::Separator();
 	}
+
+	if (assetToDelete != -1)
+		wallet_->DeleteAsset(assets[assetToDelete]);
 }
