@@ -9,6 +9,7 @@
 #include "implot.h"
 
 #include "ui/ui_manager.h"
+#include "serializer.h"
 
 
 App& App::GetInstance()
@@ -195,6 +196,8 @@ void App::Run()
 		ImGui::NewFrame();
 
 		UiManager::GetInstance().Update();
+		if (ImGui::IsKeyPressed(ImGuiKey_S) && !ImGui::GetIO().WantTextInput)
+			Serializer::GetInstance().SaveData();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

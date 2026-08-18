@@ -43,7 +43,6 @@ void AssetListWindow::NewAssetSectionUpdate()
 		if (ImGui::Button("cancel"))
 		{
 			creatingNewAsset_ = false;
-			
 			Asset asset;
 			newAsset_ = asset;
 		}
@@ -52,6 +51,9 @@ void AssetListWindow::NewAssetSectionUpdate()
 		
 		if (ImGui::Button("save"))
 		{
+			// TODO: Check if new asset is valid
+			
+			creatingNewAsset_ = false;
 			wallet_->AddNewAsset(newAsset_);
 			Asset asset;
 			newAsset_ = asset;
