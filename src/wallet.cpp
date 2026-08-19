@@ -9,7 +9,7 @@ Wallet& Wallet::GetInstance()
 	return instance;
 }
 
-void Wallet::AddNewAsset(const Asset _asset)
+void Wallet::AddAsset(const Asset _asset)
 {
 	assets_.push_back(_asset);
 }
@@ -24,6 +24,12 @@ void Wallet::DeleteAsset(const Asset& _asset)
 			break;
 		}
 	}
+}
+
+void Wallet::DeleteAllAssets()
+{
+	std::vector<Asset> newAssets;
+	assets_ = newAssets;
 }
 
 const std::vector<Asset>& Wallet::GetAssets() const

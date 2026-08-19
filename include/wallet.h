@@ -20,8 +20,9 @@ public:
 	Wallet& operator=(const Wallet&) = delete;
 	static Wallet& GetInstance();
 
-	void AddNewAsset(const Asset _asset);
+	void AddAsset(const Asset _asset);
 	void DeleteAsset(const Asset& _asset);
+	void DeleteAllAssets();
 
 	const std::vector<Asset>& GetAssets() const;
 };

@@ -49,12 +49,12 @@ void AssetListWindow::NewAssetSectionUpdate()
 
 		ImGui::SameLine();
 		
-		if (ImGui::Button("save"))
+		if (ImGui::Button("add"))
 		{
 			// TODO: Check if new asset is valid
 			
 			creatingNewAsset_ = false;
-			wallet_->AddNewAsset(newAsset_);
+			wallet_->AddAsset(newAsset_);
 			Asset asset;
 			newAsset_ = asset;
 		}

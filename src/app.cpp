@@ -196,8 +196,11 @@ void App::Run()
 		ImGui::NewFrame();
 
 		UiManager::GetInstance().Update();
+		// serialization
 		if (ImGui::IsKeyPressed(ImGuiKey_S) && !ImGui::GetIO().WantTextInput)
 			Serializer::GetInstance().SaveData();
+		if (ImGui::IsKeyPressed(ImGuiKey_L) && !ImGui::GetIO().WantTextInput)
+			Serializer::GetInstance().LoadData();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
