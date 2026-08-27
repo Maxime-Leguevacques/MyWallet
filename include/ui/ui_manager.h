@@ -12,6 +12,7 @@ private:
 	std::unordered_map<std::string, std::unique_ptr<Window>> windows_;
 	int activeTab_ = 0;
 	bool newAssetWindow_ = false;
+	bool isHelpPopupActive_ = false;
 
 private:
 	UiManager() = default;
@@ -32,6 +33,8 @@ private:
 	void SetupAssetDockSpace();
 	void SetupInsightsDockSpace();
 
+	void UpdateHelpPopup();
+
 public:
 	UiManager(const UiManager&) = delete;
 	UiManager& operator=(const UiManager&) = delete;
@@ -39,4 +42,5 @@ public:
 
 	void Init();
 	void Update();
+	void ToggleHelpPopup();
 };

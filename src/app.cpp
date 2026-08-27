@@ -184,6 +184,8 @@ void App::Run()
 	const ImGuiIO& io = ImGui::GetIO();
 	glViewport(0, 0, screenSize_.x, screenSize_.y);
 
+	Serializer::GetInstance().LoadData();
+
 	while (!glfwWindowShouldClose(mainWindow_))
 	{
 		glfwPollEvents();
@@ -196,6 +198,8 @@ void App::Run()
 		ImGui::NewFrame();
 
 		UiManager::GetInstance().Update();
+		if (ImGui::IsKeyPressed(ImGuiKey_H) && !ImGui::GetIO().WantTextInput)
+			UiManager::GetInstance().ToggleHelpPopup();
 		// serialization
 		if (ImGui::IsKeyPressed(ImGuiKey_S) && !ImGui::GetIO().WantTextInput)
 			Serializer::GetInstance().SaveData();

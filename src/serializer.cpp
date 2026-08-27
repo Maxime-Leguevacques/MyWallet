@@ -27,8 +27,12 @@ void Serializer::SaveData()
 		return;
 	}
 
-	// save all assets
+	// create json save
 	nlohmann::json json;
+	
+	// save dashboard
+	
+	// save all assets
 	json["assets"] = nlohmann::json::array();
 
 	std::vector<Asset> assets = Wallet::GetInstance().GetAssets();
@@ -42,9 +46,9 @@ void Serializer::SaveData()
 		});
 	}
 
+	// write to file
 	std::ofstream file (saveFile / "wallet.json");
 	file << json.dump(8);
-	std::cout << "saved all data to " << saveFile << " as:\n" << json.dump(8) << std::endl;
 }
 
 void Serializer::LoadData()
@@ -77,6 +81,24 @@ void Serializer::LoadData()
 		asset.broker = json["assets"][i]["broker"];
 		Wallet::GetInstance().AddAsset(asset);
 	}
+}
 
-	std::cout << "loaded all wallet.json data:\n" << json.dump(8) << std::endl;
+void Serializer::SaveDashboard()
+{
+
+}
+
+void Serializer::SaveAssets()
+{
+
+}
+
+void Serializer::LoadDashboard()
+{
+
+}
+
+void Serializer::LoadAssets()
+{
+
 }

@@ -14,4 +14,10 @@ public:
 private:
 	Serializer() = default;
 	~Serializer() = default;
+
+	void SaveDashboard();
+	void SaveAssets();
+
+	void LoadDashboard();
+	void LoadAssets();
 };

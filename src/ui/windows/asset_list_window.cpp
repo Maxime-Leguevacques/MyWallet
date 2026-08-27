@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include "misc/cpp/imgui_stdlib.h"
-
 #include "wallet.h"
 #include "ui/ui_manager.h"
 
@@ -68,10 +66,10 @@ void AssetListWindow::AssetListUpdate()
 	const std::vector<Asset>& assets = wallet_->GetAssets();
 	for (int i = 0; i < assets.size(); i++)
 	{
-		ImGui::Text("%s", assets[i].name.c_str());
-		ImGui::Text("%s", assets[i].isin.c_str());
-		ImGui::Text("%s", assets[i].ticker.c_str());
-		ImGui::Text("%s", assets[i].broker.c_str());
+		ImGui::Text("name:   %s", assets[i].name.c_str());
+		ImGui::Text("ISIN:   %s", assets[i].isin.c_str());
+		ImGui::Text("ticker: %s", assets[i].ticker.c_str());
+		ImGui::Text("broker: %s", assets[i].broker.c_str());
 		
 		ImGui::PushID(i);
 		if (ImGui::Button("X"))

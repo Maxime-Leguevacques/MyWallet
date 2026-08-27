@@ -152,6 +152,20 @@ void UiManager::SetupInsightsDockSpace()
 
 }
 
+void UiManager::UpdateHelpPopup()
+{
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	ImGui::SetNextWindowSize(ImVec2(400, 400));
+
+	ImGui::Begin("Help");
+
+	ImGui::Text("- 'S' : save data");
+	ImGui::Text("- 'L' : load data");
+
+	ImGui::End();
+}
+
 UiManager& UiManager::GetInstance()
 {
 	static UiManager instance;
@@ -173,5 +187,12 @@ void UiManager::Update()
 {
 	BeginDockSpace();
 	UpdateWindows();
+	if (isHelpPopupActive_)
+		UpdateHelpPopup();
 	EndDockSpace();
+}
+
+void UiManager::ToggleHelpPopup()
+{
+	isHelpPopupActive_ = !isHelpPopupActive_;
 }
