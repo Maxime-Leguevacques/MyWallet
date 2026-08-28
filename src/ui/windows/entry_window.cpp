@@ -10,16 +10,32 @@ EntryWindow::EntryWindow(const std::string& _name)
 
 void EntryWindow::Update()
 {
+	Wallet& wallet = Wallet::GetInstance();
+
 	ImGui::Begin(name_.c_str());
 	
 	ImGui::Text("monthly investment");
 	ImGui::SameLine();
-	ImGui::InputFloat("€", &monthlyInvestment);
-	//ImGui::Text("IUSQ | 100% | 517,89€");
-	//ImGui::Text("IUSN | 100% | 517,89€");
-	//ImGui::Text("CEBL | 100% | 517,89€");
-	//ImGui::Text("XDWF | 100% | 517,89€");
-	//ImGui::Text("XDW0 | 100% | 517,89€");
+	ImGui::SetNextItemWidth(75);
+	ImGui::InputFloat("€", &wallet.entryOverview.monthlyInvestment, 0.0f, 0.0f, "%.2f");
+	
+	const std::vector<Asset>& assets = wallet.GetAssets();
+	std::unordered_map<std::string, float>& assetsPercentage = wallet.entryOverview.assetsPercentage;
+
+	for (const Asset& asset : assets)
+	{
+		float& percentage = assetsPercentage[asset.isin];
+		ImGui::Text("%s", asset.ticker.c_str());
+		ImGui::SameLine();
+		ImGui::PushID(asset.ticker.c_str());
+		ImGui::SetNextItemWidth(75);
+		ImGui::InputFloat("%", &percentage, 0.0f, 0.0f, "%.2f");
+		ImGui::SameLine();
+		float investment = percentage / 100.0f * wallet.entryOverview.monthlyInvestment;
+		ImGui::Text(" ->  %.2f€", investment);
+		ImGui::PopID();
+	}
+
 	ImGui::Separator();
 	NewOrderSectionUpdate();
 

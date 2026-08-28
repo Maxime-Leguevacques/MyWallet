@@ -3,6 +3,7 @@
 #include <string>
 
 #include "GLFW/glfw3.h"
+#include "ui/ui_manager.h"
 
 
 struct SVector2Int
@@ -17,6 +18,8 @@ private:
 	SVector2Int screenSize_;
 	std::string windowName_;
 	GLFWwindow* mainWindow_ = nullptr;
+
+	UiManager* uiManager_ = nullptr;
 
 private:
 	App() = default;
