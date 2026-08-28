@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "asset.h"
+#include "order.h"
 
 
 struct EntryOverview
@@ -21,6 +22,7 @@ public:
 
 private:
 	std::vector<Asset> assets_;
+	std::vector<Order> orders_;
 
 private:
 	Wallet() = default;

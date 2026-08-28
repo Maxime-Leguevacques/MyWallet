@@ -51,10 +51,35 @@ void EntryWindow::NewOrderSectionUpdate()
 	}
 	else
 	{
-		std::vector<Asset> assets = Wallet::GetInstance().GetAssets();
-		for (const Asset& asset : assets)
+		static const std::string* currentItem = nullptr;
+
+		if (ImGui::Button("cancel"))
 		{
-			ImGui::Text("%s", asset.ticker.c_str());
+			creatingNewOrder_ = false;
+			currentItem = nullptr;
+			Order order;
+			newOrder_ = order;
 		}
+
+
+
+		std::vector<std::string> items;
+		for (const Asset& asset : Wallet::GetInstance().GetAssets())
+			items.push_back(asset.ticker);
+
+		if (ImGui::BeginCombo("##combo", currentItem ? currentItem->c_str() : "Select an asset"))
+		{
+			for (const std::string& item : items)
+			{
+				bool isSelected = (currentItem == &item);
+				if (ImGui::Selectable(item.c_str(), isSelected))
+					currentItem = &item;
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::InputFloat("price", &newOrder_.price);
 	}
 }
