@@ -51,6 +51,7 @@ void EntryWindow::AddNewOrder(const NewOrderData& _nod)
 {	
 	// add to wallet
 	Order newOrder;
+	newOrder.id = Wallet::GetInstance().GetOrders().size() + 1;
 	newOrder.isin = Wallet::TickerToIsin(_nod.ticker);
 	newOrder.price = _nod.price;
 	newOrder.day = _nod.day;

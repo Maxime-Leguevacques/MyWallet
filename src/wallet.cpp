@@ -37,6 +37,12 @@ void Wallet::AddOrder(const Order _order)
 	orders_.push_back(_order);
 }
 
+void Wallet::DeleteAllOrders()
+{
+	std::vector<Order> newOrders;
+	orders_ = newOrders;
+}
+
 std::string Wallet::TickerToIsin(const std::string& _ticker)
 {
 	for (const Asset& asset : Wallet::GetInstance().GetAssets())

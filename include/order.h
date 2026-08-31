@@ -5,6 +5,7 @@
 
 struct Order
 {
+	int id = 0;
 	std::string isin;
 	float price = 0.0f;
 	int day;

@@ -27,9 +27,7 @@ void Serializer::SaveData()
 
 	// create json save
 	nlohmann::json json;
-	
-	SaveDashboard(json);
-	SaveAssets(json);
+	SaveWallet(json);
 
 	std::ofstream file (saveFile / "wallet.json");
 	file << json.dump(8);
@@ -54,16 +52,14 @@ void Serializer::LoadData()
 	// load json file to json object
 	std::ifstream ifs(saveFile);
 	nlohmann::json json = nlohmann::json::parse(ifs);
-
-	LoadDashboard(json);
-	LoadAssets(json);
+	LoadWallet(json);
 }
 
-void Serializer::SaveDashboard(nlohmann::json& _json)
+void Serializer::SaveWallet(nlohmann::json& _json)
 {
 	Wallet& wallet = Wallet::GetInstance();
 		
-	// Entry investment table
+	// entry investment overview table
 	_json["entry"]["monthly_investment"] = wallet.entryOverview.monthlyInvestment;
 
 	_json["entry"]["percentages"] = nlohmann::json::array();
@@ -72,10 +68,8 @@ void Serializer::SaveDashboard(nlohmann::json& _json)
 			{ "isin", isin },
 			{ "percentage", percentage }
 		});
-}
-
-void Serializer::SaveAssets(nlohmann::json& _json)
-{
+	
+	// assets
 	_json["assets"] = nlohmann::json::array();
 
 	const std::vector<Asset>& assets = Wallet::GetInstance().GetAssets();
@@ -88,20 +82,36 @@ void Serializer::SaveAssets(nlohmann::json& _json)
 			{ "broker", asset.broker }
 		});
 	}
+
+	// orders
+	_json["orders"] = nlohmann::json::array();
+	const std::vector<Order>& orders = Wallet::GetInstance().GetOrders();
+	for (const Order& order : orders)
+	{
+		_json["orders"].push_back({
+			{ "id", order.id },
+			{ "isin", order.isin },
+			{ "price", order.price },
+			{ "day", order.day },
+			{ "month", order.month },
+			{ "year", order.year },
+			{ "hour", order.hour },
+			{ "minute", order.minute }
+		});
+	}
 }
 
-void Serializer::LoadDashboard(const nlohmann::json& _json)
+void Serializer::LoadWallet(const nlohmann::json& _json)
 {
+	// entry investment overview table
 	EntryOverview eo;
 	eo.monthlyInvestment = _json["entry"]["monthly_investment"];
 	for (int i = 0; i < _json["entry"]["percentages"].size(); i++)
 		eo.assetsPercentage.emplace(_json["entry"]["percentages"][i]["isin"], _json["entry"]["percentages"][i]["percentage"]);
 
 	Wallet::GetInstance().entryOverview = eo;
-}
-
-void Serializer::LoadAssets(const nlohmann::json& _json)
-{
+	
+	// assets
 	Wallet::GetInstance().DeleteAllAssets();
 	for (int i = 0; i < _json["assets"].size(); i++)
 	{
@@ -111,5 +121,21 @@ void Serializer::LoadAssets(const nlohmann::json& _json)
 		asset.ticker = _json["assets"][i]["ticker"];
 		asset.broker = _json["assets"][i]["broker"];
 		Wallet::GetInstance().AddAsset(asset);
+	}
+
+	// orders
+	Wallet::GetInstance().DeleteAllOrders();
+	for (int i = 0; i < _json["orders"].size(); i++)
+	{
+		Order order;
+		order.id = _json["orders"][i]["id"];
+		order.isin = _json["orders"][i]["isin"];
+		order.price = _json["orders"][i]["price"];
+		order.day = _json["orders"][i]["day"];
+		order.month = _json["orders"][i]["month"];
+		order.year = _json["orders"][i]["year"];
+		order.hour = _json["orders"][i]["hour"];
+		order.minute = _json["orders"][i]["minute"];
+		Wallet::GetInstance().AddOrder(order);
 	}
 }

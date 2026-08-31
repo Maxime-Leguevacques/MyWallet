@@ -34,6 +34,7 @@ public:
 	void DeleteAllAssets();
 
 	void AddOrder(const Order _order);
+	void DeleteAllOrders();
 
 	static std::string TickerToIsin(const std::string& _ticker);
 	static std::string IsinToTicker(const std::string& _isin);

@@ -22,9 +22,7 @@ private:
 	Serializer() = default;
 	~Serializer() = default;
 
-	static void SaveDashboard(nlohmann::json& _json);
-	static void SaveAssets(nlohmann::json& _json);
+	static void SaveWallet(nlohmann::json& _json);
 
-	static void LoadDashboard(const nlohmann::json& _json);
-	static void LoadAssets(const nlohmann::json& _json);
+	static void LoadWallet(const nlohmann::json& _json);
 };
