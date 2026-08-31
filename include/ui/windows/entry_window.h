@@ -6,11 +6,19 @@
 #include "order.h"
 
 
+struct NewOrderData
+{
+	std::string ticker;
+	int day = 1, month = 1, year = 2000, hour = 0, minute = 0;
+	float price = 0;
+};
+
+
 class EntryWindow : public Window
 {
 private:
 	bool creatingNewOrder_ = false;
-	Order newOrder_;
+	NewOrderData nod_;
 	
 public:
 	EntryWindow(const std::string& _name);
@@ -18,5 +26,8 @@ public:
 	void Update() override;
 
 private:
-	void NewOrderSectionUpdate();
+	void AddNewOrder(const NewOrderData& _nod);
+
+	void NewOrderUpdate();
+	void OrderListUpdate();
 };

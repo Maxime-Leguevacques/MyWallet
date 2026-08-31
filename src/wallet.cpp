@@ -32,7 +32,33 @@ void Wallet::DeleteAllAssets()
 	assets_ = newAssets;
 }
 
+void Wallet::AddOrder(const Order _order)
+{
+	orders_.push_back(_order);
+}
+
+std::string Wallet::TickerToIsin(const std::string& _ticker)
+{
+	for (const Asset& asset : Wallet::GetInstance().GetAssets())
+		if (asset.ticker == _ticker)
+			return asset.isin;
+	return "";
+}
+
+std::string Wallet::IsinToTicker(const std::string& _isin)
+{
+	for (const Asset& asset : Wallet::GetInstance().GetAssets())
+		if (asset.isin == _isin)
+			return asset.ticker;
+	return "";
+}
+
 const std::vector<Asset>& Wallet::GetAssets() const
 {
 	return assets_;
+}
+
+const std::vector<Order>& Wallet::GetOrders() const
+{
+	return orders_;
 }

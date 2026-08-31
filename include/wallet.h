@@ -24,10 +24,6 @@ private:
 	std::vector<Asset> assets_;
 	std::vector<Order> orders_;
 
-private:
-	Wallet() = default;
-	~Wallet() = default;
-
 public:
 	Wallet(const Wallet&) = delete;
 	Wallet& operator=(const Wallet&) = delete;
@@ -37,5 +33,15 @@ public:
 	void DeleteAsset(const Asset& _asset);
 	void DeleteAllAssets();
 
+	void AddOrder(const Order _order);
+
+	static std::string TickerToIsin(const std::string& _ticker);
+	static std::string IsinToTicker(const std::string& _isin);
+
 	const std::vector<Asset>& GetAssets() const;
+	const std::vector<Order>& GetOrders() const;
+
+private:
+	Wallet() = default;
+	~Wallet() = default;
 };

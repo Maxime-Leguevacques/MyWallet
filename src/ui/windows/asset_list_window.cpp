@@ -36,7 +36,6 @@ void AssetListWindow::NewAssetSectionUpdate()
 		ImGui::InputText("name", &newAsset_.name);
 		ImGui::InputText("ISIN", &newAsset_.isin);
 		ImGui::InputText("ticker", &newAsset_.ticker);
-		ImGui::InputText("subticker", &newAsset_.subticker);
 		ImGui::InputText("broker", &newAsset_.broker);
 
 		if (ImGui::Button("cancel"))
@@ -70,7 +69,6 @@ void AssetListWindow::AssetListUpdate()
 		ImGui::Text("name      : %s", assets[i].name.c_str());
 		ImGui::Text("ISIN      : %s", assets[i].isin.c_str());
 		ImGui::Text("ticker    : %s", assets[i].ticker.c_str());
-		ImGui::Text("subticker : %s", assets[i].subticker.c_str());
 		ImGui::Text("broker    : %s", assets[i].broker.c_str());
 		
 		ImGui::PushID(i);

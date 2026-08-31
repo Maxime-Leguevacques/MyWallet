@@ -85,7 +85,6 @@ void Serializer::SaveAssets(nlohmann::json& _json)
 			{ "name", asset.name },
 			{ "isin", asset.isin },
 			{ "ticker", asset.ticker },
-			{ "subticker", asset.subticker },
 			{ "broker", asset.broker }
 		});
 	}
@@ -110,7 +109,6 @@ void Serializer::LoadAssets(const nlohmann::json& _json)
 		asset.name = _json["assets"][i]["name"];
 		asset.isin = _json["assets"][i]["isin"];
 		asset.ticker = _json["assets"][i]["ticker"];
-		asset.subticker = _json["assets"][i]["subticker"];
 		asset.broker = _json["assets"][i]["broker"];
 		Wallet::GetInstance().AddAsset(asset);
 	}
