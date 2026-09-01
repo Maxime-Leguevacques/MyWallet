@@ -166,9 +166,9 @@ void EntryWindow::OrderListUpdate()
 	if (ImGui::BeginTable("Order List", 3, orderListTableFlags))
 	{
 
-		ImGui::TableSetupColumn("date & time");
-		ImGui::TableSetupColumn("asset");
-		ImGui::TableSetupColumn("price");
+		ImGui::TableSetupColumn("date & time", ImGuiTableColumnFlags_WidthStretch, 2.0f);
+		ImGui::TableSetupColumn("asset", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+		ImGui::TableSetupColumn("price", ImGuiTableColumnFlags_WidthStretch, 1.0f);
 
 		const std::vector<Order>& orders = Wallet::GetInstance().GetOrders();
 		for (auto it = orders.rbegin(); it != orders.rend(); it++)
@@ -184,7 +184,7 @@ void EntryWindow::OrderListUpdate()
 			ImGui::Text("%s", Wallet::IsinToTicker(order.isin).c_str());
 
 			ImGui::TableSetColumnIndex(2);
-			ImGui::Text("%f", order.price);
+			ImGui::Text("%.2f", order.price);
 		}
 
 		ImGui::EndTable();
