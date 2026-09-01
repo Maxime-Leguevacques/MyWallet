@@ -48,7 +48,6 @@ void Serializer::LoadData()
 		return;
 	}
 
-	
 	// load json file to json object
 	std::ifstream ifs(saveFile);
 	nlohmann::json json = nlohmann::json::parse(ifs);
