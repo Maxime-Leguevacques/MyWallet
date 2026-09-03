@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 
 struct Asset
@@ -9,5 +10,5 @@ struct Asset
 	std::string isin;
 	std::string ticker;
 	std::string broker;
-	float price;
+	std::vector<float> positions;
 };

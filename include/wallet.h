@@ -39,6 +39,7 @@ public:
 	static std::string TickerToIsin(const std::string& _ticker);
 	static std::string IsinToTicker(const std::string& _isin);
 
+	const Asset* GetAsset(const std::string& _isin);
 	const std::vector<Asset>& GetAssets() const;
 	const std::vector<Order>& GetOrders() const;
 

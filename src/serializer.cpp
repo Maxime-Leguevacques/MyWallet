@@ -90,7 +90,7 @@ void Serializer::SaveWallet(nlohmann::json& _json)
 		_json["orders"].push_back({
 			{ "id", order.id },
 			{ "isin", order.isin },
-			{ "price", order.price },
+			{ "quantity", order.quantity },
 			{ "day", order.day },
 			{ "month", order.month },
 			{ "year", order.year },
@@ -129,7 +129,7 @@ void Serializer::LoadWallet(const nlohmann::json& _json)
 		Order order;
 		order.id = _json["orders"][i]["id"];
 		order.isin = _json["orders"][i]["isin"];
-		order.price = _json["orders"][i]["price"];
+		order.quantity = _json["orders"][i]["quantity"];
 		order.day = _json["orders"][i]["day"];
 		order.month = _json["orders"][i]["month"];
 		order.year = _json["orders"][i]["year"];

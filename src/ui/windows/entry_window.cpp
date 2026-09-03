@@ -53,12 +53,13 @@ void EntryWindow::AddNewOrder(const NewOrderData& _nod)
 	Order newOrder;
 	newOrder.id = Wallet::GetInstance().GetOrders().size() + 1;
 	newOrder.isin = Wallet::TickerToIsin(_nod.ticker);
-	newOrder.price = _nod.price;
+	newOrder.quantity = _nod.quantity;
 	newOrder.day = _nod.day;
 	newOrder.month = _nod.month;
 	newOrder.year = _nod.year;
 	newOrder.hour = _nod.hour;
 	newOrder.minute = _nod.minute;
+	
 
 	Wallet::GetInstance().AddOrder(newOrder);
 }
@@ -96,7 +97,10 @@ void EntryWindow::NewOrderUpdate()
 		}
 
 		ImGui::SetNextItemWidth(75);
-		ImGui::InputFloat("price", &nod_.price);
+		ImGui::InputFloat("current position (€)", &nod_.assetPosition);
+
+		ImGui::SetNextItemWidth(75);
+		ImGui::InputFloat("quantity (€)", &nod_.quantity);
 			
 		ImGui::Text("Date (DD/MM/YYYY)");
 
@@ -168,7 +172,7 @@ void EntryWindow::OrderListUpdate()
 
 		ImGui::TableSetupColumn("date & time", ImGuiTableColumnFlags_WidthStretch, 2.0f);
 		ImGui::TableSetupColumn("asset", ImGuiTableColumnFlags_WidthStretch, 1.0f);
-		ImGui::TableSetupColumn("price", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+		ImGui::TableSetupColumn("quantity (€)", ImGuiTableColumnFlags_WidthStretch, 1.0f);
 
 		const std::vector<Order>& orders = Wallet::GetInstance().GetOrders();
 		for (auto it = orders.rbegin(); it != orders.rend(); it++)
@@ -184,7 +188,7 @@ void EntryWindow::OrderListUpdate()
 			ImGui::Text("%s", Wallet::IsinToTicker(order.isin).c_str());
 
 			ImGui::TableSetColumnIndex(2);
-			ImGui::Text("%.2f", order.price);
+			ImGui::Text("%.2f", order.quantity);
 		}
 
 		ImGui::EndTable();

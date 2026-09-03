@@ -59,6 +59,15 @@ std::string Wallet::IsinToTicker(const std::string& _isin)
 	return "";
 }
 
+const Asset* Wallet::GetAsset(const std::string& _isin)
+{
+	for (const Asset& asset : assets_)
+		if (asset.isin == _isin)
+			return &asset;
+	
+	return nullptr;
+}
+
 const std::vector<Asset>& Wallet::GetAssets() const
 {
 	return assets_;
