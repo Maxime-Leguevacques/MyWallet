@@ -9,7 +9,7 @@ Wallet& Wallet::GetInstance()
 	return instance;
 }
 
-void Wallet::AddAsset(const Asset _asset)
+void Wallet::AddAsset(const Asset& _asset)
 {
 	assets_.push_back(_asset);
 }
@@ -32,9 +32,16 @@ void Wallet::DeleteAllAssets()
 	assets_ = newAssets;
 }
 
-void Wallet::AddOrder(const Order _order)
+void Wallet::AddOrder(const Order& _order)
 {
 	orders_.push_back(_order);
+	
+	Asset* asset = GetAsset(_order.isin);
+	int nbPositions = asset->positions.size();
+	int currentPosition = nbPositions > 0 ? asset->positions[nbPositions - 1] : 0.0f;
+	currentPosition += _order.quantity;
+	asset->positions.push_back(currentPosition);
+	GetAsset(_order.isin)->orders.push_back(_order);
 }
 
 void Wallet::DeleteAllOrders()
@@ -59,9 +66,9 @@ std::string Wallet::IsinToTicker(const std::string& _isin)
 	return "";
 }
 
-const Asset* Wallet::GetAsset(const std::string& _isin)
+Asset* Wallet::GetAsset(const std::string& _isin)
 {
-	for (const Asset& asset : assets_)
+	for (Asset& asset : assets_)
 		if (asset.isin == _isin)
 			return &asset;
 	

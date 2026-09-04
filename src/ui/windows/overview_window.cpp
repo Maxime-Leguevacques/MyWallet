@@ -1,27 +1,32 @@
 #include "ui/windows/overview_window.h"
 
 #include <algorithm>
+#include <vector>
 
 #include "implot.h"
+
+#include "wallet.h"
 
 
 void OverviewWindow::UpdatePortfolioAssetChart()
 {
-	static const char* labels[] =
-	{
-		"Dattes",
-		"Bananas",
-		"Pates",
-		"Grapes"
-	};
+	std::vector<const char*> labels;
+	std::vector<float> values;
 
-	static double values[] =
+	const auto& assets = Wallet::GetInstance().GetAssets();
+	labels.reserve(assets.size());
+	values.reserve(assets.size());
+
+	for (const Asset& asset : assets)
 	{
-		30.0,
-		25.0,
-		20.0,
-		25.0
-	};
+		labels.push_back(asset.ticker.c_str());
+		float position = asset.positions.empty() 
+			? 0.0f
+			: asset.positions.back();
+
+		values.push_back(static_cast<double>(position));
+	}
+
 
 	float width = ImGui::GetContentRegionAvail().x;
 
@@ -34,7 +39,7 @@ void OverviewWindow::UpdatePortfolioAssetChart()
 	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
 
 	if (ImPlot::BeginPlot(
-		"Fruit Distribution",
+		"wallet distribution",
 		ImVec2(size, size),
 		ImPlotFlags_Equal
 	))
@@ -49,9 +54,9 @@ void OverviewWindow::UpdatePortfolioAssetChart()
 		ImPlot::SetupAxesLimits(0, 1, 0, 1);
 
 		ImPlot::PlotPieChart(
-			labels,
-			values,
-			4,
+			labels.data(),
+			values.data(),
+			static_cast<int>(values.size()),
 			0.5,
 			0.5,
 			0.4,

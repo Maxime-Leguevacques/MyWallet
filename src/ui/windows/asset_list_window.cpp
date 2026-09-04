@@ -70,6 +70,10 @@ void AssetListWindow::AssetListUpdate()
 		ImGui::Text("ISIN      : %s", assets[i].isin.c_str());
 		ImGui::Text("ticker    : %s", assets[i].ticker.c_str());
 		ImGui::Text("broker    : %s", assets[i].broker.c_str());
+		ImGui::Text("######################");
+		const std::vector<float>& positions = assets[i].positions;
+		float currentPosition = positions.size() > 0 ? positions[positions.size() - 1] : 0.0f;
+		ImGui::Text("position  : %.2f", currentPosition);
 		
 		ImGui::PushID(i);
 		if (ImGui::Button("X"))

@@ -51,7 +51,6 @@ void EntryWindow::AddNewOrder(const NewOrderData& _nod)
 {	
 	// add to wallet
 	Order newOrder;
-	newOrder.id = Wallet::GetInstance().GetOrders().size() + 1;
 	newOrder.isin = Wallet::TickerToIsin(_nod.ticker);
 	newOrder.quantity = _nod.quantity;
 	newOrder.day = _nod.day;
@@ -60,7 +59,6 @@ void EntryWindow::AddNewOrder(const NewOrderData& _nod)
 	newOrder.hour = _nod.hour;
 	newOrder.minute = _nod.minute;
 	
-
 	Wallet::GetInstance().AddOrder(newOrder);
 }
 
@@ -97,10 +95,10 @@ void EntryWindow::NewOrderUpdate()
 		}
 
 		ImGui::SetNextItemWidth(75);
-		ImGui::InputFloat("current position (€)", &nod_.assetPosition);
+		ImGui::InputFloat("current position (€)", &nod_.assetPosition, 0.0f, 0.0f, "%.2f");
 
 		ImGui::SetNextItemWidth(75);
-		ImGui::InputFloat("quantity (€)", &nod_.quantity);
+		ImGui::InputFloat("quantity (€)", &nod_.quantity, 0.0f, 0.0f, "%.2f");
 			
 		ImGui::Text("Date (DD/MM/YYYY)");
 

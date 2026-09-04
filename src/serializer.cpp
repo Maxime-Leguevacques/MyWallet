@@ -78,7 +78,7 @@ void Serializer::SaveWallet(nlohmann::json& _json)
 			{ "name", asset.name },
 			{ "isin", asset.isin },
 			{ "ticker", asset.ticker },
-			{ "broker", asset.broker }
+			{ "broker", asset.broker },
 		});
 	}
 
@@ -88,7 +88,6 @@ void Serializer::SaveWallet(nlohmann::json& _json)
 	for (const Order& order : orders)
 	{
 		_json["orders"].push_back({
-			{ "id", order.id },
 			{ "isin", order.isin },
 			{ "quantity", order.quantity },
 			{ "day", order.day },
@@ -127,7 +126,6 @@ void Serializer::LoadWallet(const nlohmann::json& _json)
 	for (int i = 0; i < _json["orders"].size(); i++)
 	{
 		Order order;
-		order.id = _json["orders"][i]["id"];
 		order.isin = _json["orders"][i]["isin"];
 		order.quantity = _json["orders"][i]["quantity"];
 		order.day = _json["orders"][i]["day"];
