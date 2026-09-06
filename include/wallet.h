@@ -10,7 +10,7 @@
 
 struct EntryOverview
 {
-	float monthlyInvestment;
+	float monthlyInvestment = 0.0f;
 	std::unordered_map<std::string, float> assetsPercentage;
 };
 
@@ -21,7 +21,6 @@ public:
 	EntryOverview entryOverview;
 
 private:
-	int test;
 	std::vector<Asset> assets_;
 
 public:
@@ -31,12 +30,17 @@ public:
 
 	void AddAsset(const Asset& _asset);
 	void DeleteAsset(const Asset& _asset);
-	void DeleteAssets();
+	void ClearAssets();
+
+	bool HasIsin(const std::string& _isin) const;
+	bool HasTicker(const std::string& _ticker) const;
+	bool CanAddAsset(const Asset& _asset) const;
 
 	static std::string TickerToIsin(const std::string& _ticker);
 	static std::string IsinToTicker(const std::string& _isin);
 
 	Asset* GetAsset(const std::string& _isin);
+	const Asset* GetAsset(const std::string& _isin) const;
 	const std::vector<Asset>& GetAssets() const;
 
 private:

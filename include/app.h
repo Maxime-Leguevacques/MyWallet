@@ -3,12 +3,12 @@
 #include <string>
 
 #include "GLFW/glfw3.h"
-#include "ui/ui_manager.h"
 
 
 struct SVector2Int
 {
-	int x, y;
+	int x = 1280;
+	int y = 720;
 };
 
 
@@ -16,10 +16,10 @@ class App
 {
 private:
 	SVector2Int screenSize_;
-	std::string windowName_;
+	std::string windowName_ = "MyWallet";
 	GLFWwindow* mainWindow_ = nullptr;
-
-	UiManager* uiManager_ = nullptr;
+	bool isInitialized_ = false;
+	bool isImGuiInitialized_ = false;
 
 private:
 	App() = default;
@@ -32,6 +32,7 @@ public:
 	App& operator=(const App&) = delete;
 	static App& GetInstance();
 
-	void Init();
+	bool Init();
+	void Shutdown();
 	void Run();
 };

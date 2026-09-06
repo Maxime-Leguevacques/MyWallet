@@ -2,11 +2,9 @@
 
 #include <vector>
 #include <algorithm>
-#include <iostream>
 
 #include "wallet.h"
 #include "order_manager.h"
-#include "imgui/implot.h"
 
 
 EntryWindow::EntryWindow(const std::string& _name)
@@ -18,9 +16,11 @@ void EntryWindow::Update()
 
 	ImGui::Begin(name_.c_str());
 	
-	ImGui::Text("monthly investment");
+	ImGui::Text("Monthly investment");
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(75);
+	if (wallet.entryOverview.monthlyInvestment < 0.0f)
+		wallet.entryOverview.monthlyInvestment = 0.0f;
 	ImGui::InputFloat("€", &wallet.entryOverview.monthlyInvestment, 0.0f, 0.0f, "%.2f");
 	
 	const std::vector<Asset>& assets = wallet.GetAssets();
@@ -29,6 +29,8 @@ void EntryWindow::Update()
 	for (const Asset& asset : assets)
 	{
 		float& percentage = assetsPercentage[asset.isin];
+		if (percentage < 0.0f)
+			percentage = 0.0f;
 		ImGui::Text("%s", asset.ticker.c_str());
 		ImGui::SameLine();
 		ImGui::PushID(asset.ticker.c_str());
@@ -71,24 +73,23 @@ void EntryWindow::NewOrderUpdate()
 		if (ImGui::Button("new order"))
 		{
 			creatingNewOrder_ = true;
-			NewOrderData nod;
-			nod_ = nod;
+			nod_ = NewOrderData{};
+			currentAsset_.clear();
+			validationError_.clear();
 		}
 	}
 	else
 	{
-		static std::string currentAsset;
-
 		ImGui::SetNextItemWidth(115);
-		if (ImGui::BeginCombo("##combo", currentAsset.empty() ? "Select asset" : currentAsset.c_str()))
+		if (ImGui::BeginCombo("##combo", currentAsset_.empty() ? "Select asset" : currentAsset_.c_str()))
 		{
 			for (const Asset& asset : Wallet::GetInstance().GetAssets())
 			{
-				bool isSelected = (currentAsset == asset.ticker);
+				bool isSelected = (currentAsset_ == asset.ticker);
 				if (ImGui::Selectable(asset.ticker.c_str(), isSelected))
 				{
-					currentAsset = asset.ticker;
-					nod_.ticker = currentAsset;
+					currentAsset_ = asset.ticker;
+					nod_.ticker = currentAsset_;
 				}
 				if (isSelected)
 					ImGui::SetItemDefaultFocus();
@@ -98,9 +99,13 @@ void EntryWindow::NewOrderUpdate()
 
 		ImGui::SetNextItemWidth(75);
 		ImGui::InputFloat("quantity (€)", &nod_.quantity, 0.0f, 0.0f, "%.2f");
+		if (nod_.quantity < 0.0f)
+			nod_.quantity = 0.0f;
 			
 		ImGui::SetNextItemWidth(75);
 		ImGui::InputFloat("position after trade (€)", &nod_.positionAfterTrade, 0.0f, 0.0f, "%.2f");
+		if (nod_.positionAfterTrade < 0.0f)
+			nod_.positionAfterTrade = 0.0f;
 		ImGui::Text("Date (DD/MM/YYYY)");
 
 		ImGui::SetNextItemWidth(25);
@@ -121,7 +126,7 @@ void EntryWindow::NewOrderUpdate()
 		
 		ImGui::SetNextItemWidth(40);
 		ImGui::InputInt("##year", &nod_.year, 0, 0);
-		nod_.year = std::clamp(nod_.year, 1111, 9999);
+		nod_.year = std::clamp(nod_.year, 1900, 9999);
 
 
 		ImGui::Text("Time (HH/MM)");
@@ -138,22 +143,56 @@ void EntryWindow::NewOrderUpdate()
 		ImGui::InputInt("##minute", &nod_.minute, 0, 0);
 		nod_.minute = std::clamp(nod_.minute, 0, 59);
 
+		if (!validationError_.empty())
+			ImGui::TextColored(ImVec4(1.0f, 0.45f, 0.45f, 1.0f), "%s", validationError_.c_str());
+
 
 		if (ImGui::Button("cancel"))
 		{
 			creatingNewOrder_ = false;
-			currentAsset.clear();
-			Order order;
+			currentAsset_.clear();
+			validationError_.clear();
+			nod_ = NewOrderData{};
 		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("add"))
 		{
-			creatingNewOrder_ = false;
-			currentAsset.clear();
-			AddNewOrder(nod_);
-			Order order;
+			Order newOrder;
+			newOrder.isin = Wallet::TickerToIsin(nod_.ticker);
+			newOrder.quantity = nod_.quantity;
+			newOrder.positionAfterTrade = nod_.positionAfterTrade;
+			newOrder.day = nod_.day;
+			newOrder.month = nod_.month;
+			newOrder.year = nod_.year;
+			newOrder.hour = nod_.hour;
+			newOrder.minute = nod_.minute;
+
+			if (OrderManager::GetInstance().CanAddOrder(newOrder))
+			{
+				creatingNewOrder_ = false;
+				currentAsset_.clear();
+				validationError_.clear();
+				AddNewOrder(nod_);
+				nod_ = NewOrderData{};
+			}
+			else if (nod_.ticker.empty())
+			{
+				validationError_ = "Please select an asset.";
+			}
+			else if (nod_.quantity <= 0.0f)
+			{
+				validationError_ = "Quantity must be greater than zero.";
+			}
+			else if (nod_.positionAfterTrade < 0.0f)
+			{
+				validationError_ = "Position after trade cannot be negative.";
+			}
+			else
+			{
+				validationError_ = "Order data is invalid.";
+			}
 		}
 	}
 }
@@ -174,7 +213,7 @@ void EntryWindow::OrderListUpdate()
 		ImGui::TableSetupColumn("quantity (€)", ImGuiTableColumnFlags_WidthStretch, 1.0f);
 
 		const std::vector<Order>& orders = OrderManager::GetInstance().GetOrders();
-		for (auto it = orders.rbegin(); it != orders.rend(); it++)
+		for (auto it = orders.rbegin(); it != orders.rend(); ++it)
 		{
 			const Order& order = *it;
 

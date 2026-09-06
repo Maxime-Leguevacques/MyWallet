@@ -28,7 +28,7 @@ void OverviewWindow::UpdatePortfolioAssetChart()
 	{
 		labelsStorage.push_back(Wallet::IsinToTicker(isin));
 		labels.push_back(labelsStorage.back().c_str());
-		values.push_back(static_cast<double>(position));
+		values.push_back(position);
 	}
 
 	float width = ImGui::GetContentRegionAvail().x;
@@ -41,7 +41,7 @@ void OverviewWindow::UpdatePortfolioAssetChart()
 
 	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
 
-	if (ImPlot::BeginPlot("wallet distribution", ImVec2(size, size), ImPlotFlags_Equal))
+	if (ImPlot::BeginPlot("Wallet Distribution", ImVec2(size, size), ImPlotFlags_Equal))
 	{
 		ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_NoDecorations, ImPlotAxisFlags_NoDecorations);
 
@@ -72,7 +72,7 @@ void OverviewWindow::UpdatePortfolioGrowthChart()
 	if (wp.empty()) 
 		return;
 
-	for (int i = 0; i < wp.size(); i++)
+	for (size_t i = 0; i < wp.size(); ++i)
 	{
 		float totalPosition = 0.0f;
 		for (const auto& [isin, position] : wp[i])
@@ -89,7 +89,7 @@ void OverviewWindow::UpdatePortfolioGrowthChart()
 	float height = std::min(ImGui::GetContentRegionAvail().y, 400.0f);
 
 	if (ImPlot::BeginPlot(
-		"Banane Growth",
+		"Wallet Growth",
 		ImVec2(width, height)
 	))
 	{
@@ -118,7 +118,7 @@ void OverviewWindow::Update()
 {
 	ImGui::Begin(name_.c_str());
 
-	ImGui::Text("overview window");
+	ImGui::Text("Overview");
 
 	UpdatePortfolioAssetChart();
 	UpdatePortfolioGrowthChart();

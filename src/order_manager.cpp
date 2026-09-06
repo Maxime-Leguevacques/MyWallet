@@ -1,7 +1,5 @@
 #include "order_manager.h"
 
-#include <iostream>
-
 #include "wallet.h"
 
 
@@ -13,6 +11,9 @@ OrderManager& OrderManager::GetInstance()
 
 void OrderManager::AddOrder(const Order& _order)
 {
+	if (!CanAddOrder(_order))
+		return;
+
 	// first, add to order list
 	orders_.push_back(_order);
 
@@ -31,10 +32,23 @@ void OrderManager::AddOrder(const Order& _order)
 		walletPositions_.push_back({{ _order.isin, _order.positionAfterTrade }});
 }
 
-void OrderManager::DeleteOrders()
+bool OrderManager::CanAddOrder(const Order& _order) const
 {
-	std::vector<Order> orders;
-	orders_ = orders;
+	if (_order.isin.empty())
+		return false;
+	if (Wallet::GetInstance().GetAsset(_order.isin) == nullptr)
+		return false;
+	if (_order.quantity <= 0.0f)
+		return false;
+	if (_order.positionAfterTrade < 0.0f)
+		return false;
+	return true;
+}
+
+void OrderManager::ClearOrders()
+{
+	orders_.clear();
+	walletPositions_.clear();
 }
 
 const std::vector<Order>& OrderManager::GetOrders() const

@@ -19,7 +19,8 @@ public:
 	static OrderManager& GetInstance();
 
 	void AddOrder(const Order& _order);
-	void DeleteOrders();
+	bool CanAddOrder(const Order& _order) const;
+	void ClearOrders();
 	const std::vector<Order>& GetOrders() const;
 
 	const std::vector<std::unordered_map<std::string, float>>& GetWalletPositions() const;

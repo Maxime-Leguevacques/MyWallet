@@ -19,6 +19,8 @@ class EntryWindow : public Window
 private:
 	bool creatingNewOrder_ = false;
 	NewOrderData nod_;
+	std::string currentAsset_;
+	std::string validationError_;
 	
 public:
 	EntryWindow(const std::string& _name);

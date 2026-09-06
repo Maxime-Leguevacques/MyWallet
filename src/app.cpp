@@ -8,8 +8,8 @@
 #include "imgui_impl_opengl3.h"
 #include "implot.h"
 
-//#include "ui/ui_manager.h"
 #include "serializer.h"
+#include "ui/ui_manager.h"
 
 
 App& App::GetInstance()
@@ -118,11 +118,17 @@ void App::SetColorStyles()
 }
 
 
-void App::Init()
+bool App::Init()
 {
-#pragma region init_glfw
+	if (isInitialized_)
+		return true;
+
 	// Init window
-	glfwInit();
+	if (glfwInit() == GLFW_FALSE)
+	{
+		std::cerr << "Failed to initialize GLFW" << std::endl;
+		return false;
+	}
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
@@ -130,7 +136,19 @@ void App::Init()
 
 	// Get primary monitor
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	if (monitor == nullptr)
+	{
+		std::cerr << "Failed to get primary monitor" << std::endl;
+		Shutdown();
+		return false;
+	}
 	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	if (mode == nullptr)
+	{
+		std::cerr << "Failed to get monitor video mode" << std::endl;
+		Shutdown();
+		return false;
+	}
 
 	// monitor dimensions
 	screenSize_ = { .x = mode->width, .y = mode->height };
@@ -139,13 +157,11 @@ void App::Init()
 	if (mainWindow_ == nullptr)
 	{
 		std::cerr << "Failed to create GLFW window: " << windowName_ << std::endl;
-		glfwTerminate();
+		Shutdown();
+		return false;
 	}
 	glfwMakeContextCurrent(mainWindow_); 
-#pragma endregion init_glfw
 
-
-#pragma region init_imgui
 	// Setup ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -174,14 +190,18 @@ void App::Init()
 
 	ImGui_ImplGlfw_InitForOpenGL(mainWindow_, true);
 	ImGui_ImplOpenGL3_Init("#version 460");
-#pragma endregion init_imgui
+	isImGuiInitialized_ = true;
 	
-	uiManager_ = &UiManager::GetInstance();
-	uiManager_->Init();
+	UiManager::GetInstance().Init();
+	isInitialized_ = true;
+	return true;
 }
 
 void App::Run()
 {
+	if (!isInitialized_ || mainWindow_ == nullptr)
+		return;
+
 	const ImGuiIO& io = ImGui::GetIO();
 	glViewport(0, 0, screenSize_.x, screenSize_.y);
 
@@ -198,9 +218,9 @@ void App::Run()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		
-		uiManager_->Update();
+		UiManager::GetInstance().Update();
 		if (ImGui::IsKeyPressed(ImGuiKey_H) && !ImGui::GetIO().WantTextInput)
-			uiManager_->ToggleHelpPopup();
+			UiManager::GetInstance().ToggleHelpPopup();
 		// serialization
 		if (ImGui::IsKeyPressed(ImGuiKey_S) && !ImGui::GetIO().WantTextInput)
 			Serializer::GetInstance().SaveData();
@@ -221,8 +241,24 @@ void App::Run()
 		glfwSwapBuffers(mainWindow_);
 	}
 
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
+	Shutdown();
+}
+
+void App::Shutdown()
+{
+	if (isImGuiInitialized_)
+	{
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImPlot::DestroyContext();
+		ImGui::DestroyContext();
+		isImGuiInitialized_ = false;
+	}
+	if (mainWindow_ != nullptr)
+	{
+		glfwDestroyWindow(mainWindow_);
+		mainWindow_ = nullptr;
+	}
 	glfwTerminate();
+	isInitialized_ = false;
 }

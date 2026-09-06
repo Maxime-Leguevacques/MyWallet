@@ -1,17 +1,12 @@
 #include "ui/windows/asset_list_window.h"
 
-#include <iostream>
-
 #include "wallet.h"
 #include "order_manager.h"
-#include "ui/ui_manager.h"
 
 
 AssetListWindow::AssetListWindow(const std::string& _name)
-	: Window(_name) 
-{
-	wallet_ = &Wallet::GetInstance();
-}
+	: Window(_name),
+	wallet_(Wallet::GetInstance()) {}
 
 void AssetListWindow::Update()
 {
@@ -33,29 +28,40 @@ void AssetListWindow::NewAssetSectionUpdate()
 	}
 	else
 	{
-		ImGui::Text("create a new asset:");
+		ImGui::Text("Create a new asset:");
 		ImGui::InputText("name", &newAsset_.name);
 		ImGui::InputText("ISIN", &newAsset_.isin);
 		ImGui::InputText("ticker", &newAsset_.ticker);
 		ImGui::InputText("broker", &newAsset_.broker);
+		if (!validationError_.empty())
+			ImGui::TextColored(ImVec4(1.0f, 0.45f, 0.45f, 1.0f), "%s", validationError_.c_str());
 
 		if (ImGui::Button("cancel"))
 		{
 			creatingNewAsset_ = false;
-			Asset asset;
-			newAsset_ = asset;
+			validationError_.clear();
+			newAsset_ = Asset{};
 		}
 
 		ImGui::SameLine();
 		
 		if (ImGui::Button("add"))
 		{
-			// TODO: Check if new asset is valid
-			
-			creatingNewAsset_ = false;
-			wallet_->AddAsset(newAsset_);
-			Asset asset;
-			newAsset_ = asset;
+			if (wallet_.CanAddAsset(newAsset_))
+			{
+				creatingNewAsset_ = false;
+				validationError_.clear();
+				wallet_.AddAsset(newAsset_);
+				newAsset_ = Asset{};
+			}
+			else if (newAsset_.name.empty() || newAsset_.isin.empty() || newAsset_.ticker.empty() || newAsset_.broker.empty())
+			{
+				validationError_ = "All fields are required.";
+			}
+			else
+			{
+				validationError_ = "Asset ISIN or ticker already exists.";
+			}
 		}
 	}
 }
@@ -64,30 +70,33 @@ void AssetListWindow::AssetListUpdate()
 {
 	int assetToDelete = -1;
 
-	const std::vector<Asset>& assets = wallet_->GetAssets();
-	for (int i = 0; i < assets.size(); i++)
+	const std::vector<Asset>& assets = wallet_.GetAssets();
+	for (size_t i = 0; i < assets.size(); ++i)
 	{
 		ImGui::Text("name      : %s", assets[i].name.c_str());
 		ImGui::Text("ISIN      : %s", assets[i].isin.c_str());
 		ImGui::Text("ticker    : %s", assets[i].ticker.c_str());
 		ImGui::Text("broker    : %s", assets[i].broker.c_str());
 		ImGui::Text("######################");
-		std::vector<std::unordered_map<std::string, float>> walletPositions = OrderManager::GetInstance().GetWalletPositions();
+		const std::vector<std::unordered_map<std::string, float>>& walletPositions =
+			OrderManager::GetInstance().GetWalletPositions();
 		if (walletPositions.empty())
 			ImGui::Text("position  : 0.0f");
 		else
 		{
-			std::unordered_map<std::string, float> lastPosition = walletPositions[walletPositions.size() - 1];
-			ImGui::Text("position  : %.2f", lastPosition[assets[i].isin]);
+			const std::unordered_map<std::string, float>& lastPosition = walletPositions.back();
+			const auto positionIt = lastPosition.find(assets[i].isin);
+			const float position = (positionIt == lastPosition.end()) ? 0.0f : positionIt->second;
+			ImGui::Text("position  : %.2f", position);
 		}
-		ImGui::PushID(i);
+		ImGui::PushID(static_cast<int>(i));
 		if (ImGui::Button("X"))
-			assetToDelete = i;
+			assetToDelete = static_cast<int>(i);
 		ImGui::PopID();
 
 		ImGui::Separator();
 	}
 
 	if (assetToDelete != -1)
-		wallet_->DeleteAsset(assets[assetToDelete]);
+		wallet_.DeleteAsset(assets[assetToDelete]);
 }

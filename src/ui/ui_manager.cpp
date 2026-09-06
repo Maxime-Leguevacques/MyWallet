@@ -1,11 +1,7 @@
 #include "ui/ui_manager.h"
 
-#include <iostream>
-
 #include "imgui.h"
 #include "imgui_internal.h"
-#include "backends/imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
 
 #include "ui/windows/overview_window.h"
 #include "ui/windows/entry_window.h"
@@ -160,8 +156,9 @@ void UiManager::UpdateHelpPopup()
 
 	ImGui::Begin("Help");
 
-	ImGui::Text("- 'S' : save data");
-	ImGui::Text("- 'L' : load data");
+	ImGui::Text("- H: Toggle help");
+	ImGui::Text("- S: Save data");
+	ImGui::Text("- L: Load data");
 
 	ImGui::End();
 }

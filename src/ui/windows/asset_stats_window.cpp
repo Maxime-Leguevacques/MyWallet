@@ -8,7 +8,7 @@ void AssetStatsWindow::Update()
 {
 	ImGui::Begin(name_.c_str());
 
-	ImGui::Text("asset stats window");
+	ImGui::Text("Asset stats");
 
 	ImGui::End();
 }

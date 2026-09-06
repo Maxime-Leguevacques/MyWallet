@@ -3,6 +3,7 @@
 #include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <cstdlib>
 
 #include "wallet.h"
 #include "order_manager.h"
@@ -16,13 +17,18 @@ Serializer& Serializer::GetInstance()
 
 void Serializer::SaveData()
 {
-	// get save file
-	std::filesystem::path saveFile;
-	if (const char* home = std::getenv("HOME"))	// save directory
-		saveFile = std::filesystem::path(home) / ".local" / "share" / "MyWallet";
-	else
+	const std::optional<std::filesystem::path> saveDirectory = GetSaveDirectory();
+	if (!saveDirectory)
 	{
-		std::cout << "ERROR: couldn't find home directory" << std::endl;
+		std::cerr << "ERROR: couldn't find home directory" << std::endl;
+		return;
+	}
+
+	std::error_code ec;
+	std::filesystem::create_directories(*saveDirectory, ec);
+	if (ec)
+	{
+		std::cerr << "ERROR: couldn't create save directory: " << ec.message() << std::endl;
 		return;
 	}
 
@@ -30,29 +36,76 @@ void Serializer::SaveData()
 	nlohmann::json json;
 	SaveWallet(json);
 
-	std::ofstream file (saveFile / "wallet.json");
+	std::ofstream file(*saveDirectory / "wallet.json");
+	if (!file.is_open())
+	{
+		std::cerr << "ERROR: couldn't open wallet save file for writing" << std::endl;
+		return;
+	}
 	file << json.dump(8);
 }
 
 void Serializer::LoadData()
 {
-	// get save file
-	std::filesystem::path saveFile;
-	if (const char* home = std::getenv("HOME"))
+	const std::optional<std::filesystem::path> saveDirectory = GetSaveDirectory();
+	if (!saveDirectory)
 	{
-		// need to check if file exists
-		saveFile = std::filesystem::path(home) / ".local" / "share" / "MyWallet" / "wallet.json";
-	}
-	else
-	{
-		std::cout << "ERROR: couldn't find save file" << std::endl;
+		std::cerr << "ERROR: couldn't find home directory" << std::endl;
 		return;
 	}
 
-	// load json file to json object
+	const std::filesystem::path saveFile = *saveDirectory / "wallet.json";
+
+	std::error_code ec;
+	if (!std::filesystem::exists(saveFile, ec) || ec)
+		return;
+
 	std::ifstream ifs(saveFile);
-	nlohmann::json json = nlohmann::json::parse(ifs);
-	LoadWallet(json);
+	if (!ifs.is_open())
+	{
+		std::cerr << "ERROR: couldn't open wallet save file for reading" << std::endl;
+		return;
+	}
+
+	nlohmann::json json;
+	try
+	{
+		ifs >> json;
+	}
+	catch (const std::exception& exception)
+	{
+		std::cerr << "ERROR: couldn't parse wallet save file: " << exception.what() << std::endl;
+		return;
+	}
+
+	EntryOverview parsedEntryOverview;
+	std::vector<Asset> parsedAssets;
+	std::vector<Order> parsedOrders;
+
+	if (!ParseEntryOverview(json, parsedEntryOverview))
+	{
+		std::cerr << "ERROR: invalid save file entry section" << std::endl;
+		return;
+	}
+	if (!ParseAssets(json, parsedAssets))
+	{
+		std::cerr << "ERROR: invalid save file assets section" << std::endl;
+		return;
+	}
+	if (!ParseOrders(json, parsedOrders))
+	{
+		std::cerr << "ERROR: invalid save file orders section" << std::endl;
+		return;
+	}
+
+	Wallet::GetInstance().entryOverview = parsedEntryOverview;
+	Wallet::GetInstance().ClearAssets();
+	for (const Asset& asset : parsedAssets)
+		Wallet::GetInstance().AddAsset(asset);
+
+	OrderManager::GetInstance().ClearOrders();
+	for (const Order& order : parsedOrders)
+		OrderManager::GetInstance().AddOrder(order);
 }
 
 void Serializer::SaveWallet(nlohmann::json& _json)
@@ -101,41 +154,115 @@ void Serializer::SaveWallet(nlohmann::json& _json)
 	}
 }
 
-void Serializer::LoadWallet(const nlohmann::json& _json)
+std::optional<std::filesystem::path> Serializer::GetSaveDirectory()
 {
-	// entry investment overview table
-	EntryOverview eo;
-	eo.monthlyInvestment = _json["entry"]["monthly_investment"];
-	for (int i = 0; i < _json["entry"]["percentages"].size(); i++)
-		eo.assetsPercentage.emplace(_json["entry"]["percentages"][i]["isin"], _json["entry"]["percentages"][i]["percentage"]);
+	const char* home = std::getenv("HOME");
+	if (home == nullptr)
+		return std::nullopt;
+	return std::filesystem::path(home) / ".local" / "share" / "MyWallet";
+}
 
-	Wallet::GetInstance().entryOverview = eo;
-	
-	// assets
-	Wallet::GetInstance().DeleteAssets();
-	for (int i = 0; i < _json["assets"].size(); i++)
+bool Serializer::ParseEntryOverview(const nlohmann::json& _json, EntryOverview& _entryOverview)
+{
+	if (!_json.contains("entry") || !_json["entry"].is_object())
+		return false;
+
+	const nlohmann::json& entryJson = _json["entry"];
+	if (!entryJson.contains("monthly_investment") || !entryJson["monthly_investment"].is_number())
+		return false;
+	if (!entryJson.contains("percentages") || !entryJson["percentages"].is_array())
+		return false;
+
+	EntryOverview entryOverview;
+	entryOverview.monthlyInvestment = entryJson["monthly_investment"].get<float>();
+
+	for (const nlohmann::json& percentageItem : entryJson["percentages"])
 	{
+		if (!percentageItem.is_object())
+			return false;
+		if (!percentageItem.contains("isin") || !percentageItem["isin"].is_string())
+			return false;
+		if (!percentageItem.contains("percentage") || !percentageItem["percentage"].is_number())
+			return false;
+
+		entryOverview.assetsPercentage[percentageItem["isin"].get<std::string>()] =
+			percentageItem["percentage"].get<float>();
+	}
+
+	_entryOverview = std::move(entryOverview);
+	return true;
+}
+
+bool Serializer::ParseAssets(const nlohmann::json& _json, std::vector<Asset>& _assets)
+{
+	if (!_json.contains("assets") || !_json["assets"].is_array())
+		return false;
+
+	std::vector<Asset> assets;
+	for (const nlohmann::json& assetJson : _json["assets"])
+	{
+		if (!assetJson.is_object())
+			return false;
+		if (!assetJson.contains("name") || !assetJson["name"].is_string())
+			return false;
+		if (!assetJson.contains("isin") || !assetJson["isin"].is_string())
+			return false;
+		if (!assetJson.contains("ticker") || !assetJson["ticker"].is_string())
+			return false;
+		if (!assetJson.contains("broker") || !assetJson["broker"].is_string())
+			return false;
+
 		Asset asset;
-		asset.name = _json["assets"][i]["name"];
-		asset.isin = _json["assets"][i]["isin"];
-		asset.ticker = _json["assets"][i]["ticker"];
-		asset.broker = _json["assets"][i]["broker"];
-		Wallet::GetInstance().AddAsset(asset);
+		asset.name = assetJson["name"].get<std::string>();
+		asset.isin = assetJson["isin"].get<std::string>();
+		asset.ticker = assetJson["ticker"].get<std::string>();
+		asset.broker = assetJson["broker"].get<std::string>();
+		assets.push_back(asset);
 	}
 
-	// orders
-	OrderManager::GetInstance().DeleteOrders();
-	for (int i = 0; i < _json["orders"].size(); i++)
+	_assets = std::move(assets);
+	return true;
+}
+
+bool Serializer::ParseOrders(const nlohmann::json& _json, std::vector<Order>& _orders)
+{
+	if (!_json.contains("orders") || !_json["orders"].is_array())
+		return false;
+
+	std::vector<Order> orders;
+	for (const nlohmann::json& orderJson : _json["orders"])
 	{
+		if (!orderJson.is_object())
+			return false;
+		if (!orderJson.contains("isin") || !orderJson["isin"].is_string())
+			return false;
+		if (!orderJson.contains("quantity") || !orderJson["quantity"].is_number())
+			return false;
+		if (!orderJson.contains("position_after_trade") || !orderJson["position_after_trade"].is_number())
+			return false;
+		if (!orderJson.contains("day") || !orderJson["day"].is_number_integer())
+			return false;
+		if (!orderJson.contains("month") || !orderJson["month"].is_number_integer())
+			return false;
+		if (!orderJson.contains("year") || !orderJson["year"].is_number_integer())
+			return false;
+		if (!orderJson.contains("hour") || !orderJson["hour"].is_number_integer())
+			return false;
+		if (!orderJson.contains("minute") || !orderJson["minute"].is_number_integer())
+			return false;
+
 		Order order;
-		order.isin = _json["orders"][i]["isin"];
-		order.quantity = _json["orders"][i]["quantity"];
-		order.positionAfterTrade = _json["orders"][i]["position_after_trade"];
-		order.day = _json["orders"][i]["day"];
-		order.month = _json["orders"][i]["month"];
-		order.year = _json["orders"][i]["year"];
-		order.hour = _json["orders"][i]["hour"];
-		order.minute = _json["orders"][i]["minute"];
-		OrderManager::GetInstance().AddOrder(order);
+		order.isin = orderJson["isin"].get<std::string>();
+		order.quantity = orderJson["quantity"].get<float>();
+		order.positionAfterTrade = orderJson["position_after_trade"].get<float>();
+		order.day = orderJson["day"].get<int>();
+		order.month = orderJson["month"].get<int>();
+		order.year = orderJson["year"].get<int>();
+		order.hour = orderJson["hour"].get<int>();
+		order.minute = orderJson["minute"].get<int>();
+		orders.push_back(order);
 	}
+
+	_orders = std::move(orders);
+	return true;
 }

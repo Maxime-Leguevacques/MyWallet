@@ -1,8 +1,5 @@
 #include "wallet.h"
 
-#include <iostream>
-
-
 Wallet& Wallet::GetInstance()
 {
 	static Wallet instance;
@@ -16,7 +13,7 @@ void Wallet::AddAsset(const Asset& _asset)
 
 void Wallet::DeleteAsset(const Asset& _asset)
 {
-	for (int i = 0; i < assets_.size(); i++)
+	for (size_t i = 0; i < assets_.size(); ++i)
 	{
 		if (_asset.isin == assets_[i].isin)
 		{
@@ -26,10 +23,38 @@ void Wallet::DeleteAsset(const Asset& _asset)
 	}
 }
 
-void Wallet::DeleteAssets()
+void Wallet::ClearAssets()
 {
-	std::vector<Asset> newAssets;
-	assets_ = newAssets;
+	assets_.clear();
+}
+
+bool Wallet::HasIsin(const std::string& _isin) const
+{
+	for (const Asset& asset : assets_)
+	{
+		if (asset.isin == _isin)
+			return true;
+	}
+	return false;
+}
+
+bool Wallet::HasTicker(const std::string& _ticker) const
+{
+	for (const Asset& asset : assets_)
+	{
+		if (asset.ticker == _ticker)
+			return true;
+	}
+	return false;
+}
+
+bool Wallet::CanAddAsset(const Asset& _asset) const
+{
+	if (_asset.name.empty() || _asset.isin.empty() || _asset.ticker.empty() || _asset.broker.empty())
+		return false;
+	if (HasIsin(_asset.isin) || HasTicker(_asset.ticker))
+		return false;
+	return true;
 }
 
 std::string Wallet::TickerToIsin(const std::string& _ticker)
@@ -54,6 +79,15 @@ Asset* Wallet::GetAsset(const std::string& _isin)
 		if (asset.isin == _isin)
 			return &asset;
 	
+	return nullptr;
+}
+
+const Asset* Wallet::GetAsset(const std::string& _isin) const
+{
+	for (const Asset& asset : assets_)
+		if (asset.isin == _isin)
+			return &asset;
+
 	return nullptr;
 }
 
