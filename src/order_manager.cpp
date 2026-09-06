@@ -11,6 +11,13 @@ OrderManager& OrderManager::GetInstance()
 	return instance;
 }
 
+bool OrderManager::CanAddOrder(const Order& _order) const
+{
+	if (_order.isin.empty())
+		return false;
+	return true;
+}
+
 void OrderManager::AddOrder(const Order& _order)
 {
 	// first, add to order list

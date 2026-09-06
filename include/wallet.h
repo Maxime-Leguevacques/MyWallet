@@ -29,6 +29,7 @@ public:
 	Wallet& operator=(const Wallet&) = delete;
 	static Wallet& GetInstance();
 
+	bool CanAddAsset(const Asset& _asset);
 	void AddAsset(const Asset& _asset);
 	void DeleteAsset(const Asset& _asset);
 	void DeleteAssets();

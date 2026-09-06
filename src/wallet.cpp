@@ -9,6 +9,19 @@ Wallet& Wallet::GetInstance()
 	return instance;
 }
 
+bool Wallet::CanAddAsset(const Asset& _asset)
+{
+	if (_asset.name.empty() || _asset.isin.empty() || _asset.ticker.empty() || _asset.broker.empty())
+		return false;
+
+	// check if isin or ticker already exists
+	for (const Asset& asset : assets_)
+		if (asset.isin == _asset.isin || asset.ticker == _asset.ticker)
+			return false;
+	
+	return true;
+}
+
 void Wallet::AddAsset(const Asset& _asset)
 {
 	assets_.push_back(_asset);

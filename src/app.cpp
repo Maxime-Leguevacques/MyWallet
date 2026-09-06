@@ -8,7 +8,7 @@
 #include "imgui_impl_opengl3.h"
 #include "implot.h"
 
-//#include "ui/ui_manager.h"
+#include "ui/ui_manager.h"
 #include "serializer.h"
 
 
@@ -176,8 +176,7 @@ void App::Init()
 	ImGui_ImplOpenGL3_Init("#version 460");
 #pragma endregion init_imgui
 	
-	uiManager_ = &UiManager::GetInstance();
-	uiManager_->Init();
+	UiManager::GetInstance().Init();
 }
 
 void App::Run()
@@ -198,9 +197,9 @@ void App::Run()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		
-		uiManager_->Update();
+		UiManager::GetInstance().Update();
 		if (ImGui::IsKeyPressed(ImGuiKey_H) && !ImGui::GetIO().WantTextInput)
-			uiManager_->ToggleHelpPopup();
+			UiManager::GetInstance().ToggleHelpPopup();
 		// serialization
 		if (ImGui::IsKeyPressed(ImGuiKey_S) && !ImGui::GetIO().WantTextInput)
 			Serializer::GetInstance().SaveData();

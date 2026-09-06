@@ -10,9 +10,10 @@ class Wallet;
 class AssetListWindow : public Window
 {
 private:
-	Wallet* wallet_ = nullptr;
+	Wallet& wallet_;
 	bool creatingNewAsset_ = false;
 	Asset newAsset_;
+	std::string validationError_;
 
 public:
 	AssetListWindow(const std::string& _name);

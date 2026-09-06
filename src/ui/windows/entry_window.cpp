@@ -2,11 +2,9 @@
 
 #include <vector>
 #include <algorithm>
-#include <iostream>
 
 #include "wallet.h"
 #include "order_manager.h"
-#include "imgui/implot.h"
 
 
 EntryWindow::EntryWindow(const std::string& _name)
@@ -71,24 +69,23 @@ void EntryWindow::NewOrderUpdate()
 		if (ImGui::Button("new order"))
 		{
 			creatingNewOrder_ = true;
-			NewOrderData nod;
-			nod_ = nod;
+			nod_ = NewOrderData{};
+			validationError_.clear();
 		}
 	}
 	else
 	{
-		static std::string currentAsset;
 
 		ImGui::SetNextItemWidth(115);
-		if (ImGui::BeginCombo("##combo", currentAsset.empty() ? "Select asset" : currentAsset.c_str()))
+		if (ImGui::BeginCombo("##combo", currentModifiedAsset_.empty() ? "Select asset" : currentModifiedAsset_.c_str()))
 		{
 			for (const Asset& asset : Wallet::GetInstance().GetAssets())
 			{
-				bool isSelected = (currentAsset == asset.ticker);
+				bool isSelected = (currentModifiedAsset_ == asset.ticker);
 				if (ImGui::Selectable(asset.ticker.c_str(), isSelected))
 				{
-					currentAsset = asset.ticker;
-					nod_.ticker = currentAsset;
+					currentModifiedAsset_ = asset.ticker;
+					nod_.ticker = currentModifiedAsset_;
 				}
 				if (isSelected)
 					ImGui::SetItemDefaultFocus();
@@ -138,22 +135,45 @@ void EntryWindow::NewOrderUpdate()
 		ImGui::InputInt("##minute", &nod_.minute, 0, 0);
 		nod_.minute = std::clamp(nod_.minute, 0, 59);
 
+		if (!validationError_.empty())
+			ImGui::TextColored(ImVec4(1.0f, 0.45f, 0.45f, 1.0f), "%s", validationError_.c_str());
+
 
 		if (ImGui::Button("cancel"))
 		{
 			creatingNewOrder_ = false;
-			currentAsset.clear();
-			Order order;
+			currentModifiedAsset_.clear();
+			validationError_.clear();
+			nod_ = NewOrderData{};
 		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("add"))
 		{
-			creatingNewOrder_ = false;
-			currentAsset.clear();
-			AddNewOrder(nod_);
-			Order order;
+			Order newOrder;
+			newOrder.isin = Wallet::TickerToIsin(nod_.ticker);
+			newOrder.quantity = nod_.quantity;
+			newOrder.positionAfterTrade = nod_.positionAfterTrade;
+			newOrder.day = nod_.day;
+			newOrder.month = nod_.month;
+			newOrder.year = nod_.year;
+			newOrder.hour = nod_.hour;
+			newOrder.minute = nod_.minute;
+			
+			if (OrderManager::GetInstance().CanAddOrder(newOrder))
+			{
+				creatingNewOrder_ = false;
+				currentModifiedAsset_.clear();
+				validationError_.clear();
+				AddNewOrder(nod_);
+				nod_ = NewOrderData{};
+			}
+			else if (nod_.ticker.empty())
+				validationError_ = "Please select an asset.";
+			else
+				validationError_ = "Order data is invalid.";
+
 		}
 	}
 }

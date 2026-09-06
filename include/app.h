@@ -3,7 +3,6 @@
 #include <string>
 
 #include "GLFW/glfw3.h"
-#include "ui/ui_manager.h"
 
 
 struct SVector2Int
@@ -16,10 +15,8 @@ class App
 {
 private:
 	SVector2Int screenSize_;
-	std::string windowName_;
+	std::string windowName_ = "MyWallet";
 	GLFWwindow* mainWindow_ = nullptr;
-
-	UiManager* uiManager_ = nullptr;
 
 private:
 	App() = default;

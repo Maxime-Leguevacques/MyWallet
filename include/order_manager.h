@@ -18,6 +18,7 @@ public:
 	OrderManager& operator=(const OrderManager&) = delete;
 	static OrderManager& GetInstance();
 
+	bool CanAddOrder(const Order& _order) const;
 	void AddOrder(const Order& _order);
 	void DeleteOrders();
 	const std::vector<Order>& GetOrders() const;
