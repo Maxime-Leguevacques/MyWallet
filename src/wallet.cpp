@@ -26,28 +26,10 @@ void Wallet::DeleteAsset(const Asset& _asset)
 	}
 }
 
-void Wallet::DeleteAllAssets()
+void Wallet::DeleteAssets()
 {
 	std::vector<Asset> newAssets;
 	assets_ = newAssets;
-}
-
-void Wallet::AddOrder(const Order& _order)
-{
-	orders_.push_back(_order);
-	
-	Asset* asset = GetAsset(_order.isin);
-	int nbPositions = asset->positions.size();
-	int currentPosition = nbPositions > 0 ? asset->positions[nbPositions - 1] : 0.0f;
-	currentPosition += _order.quantity;
-	asset->positions.push_back(currentPosition);
-	GetAsset(_order.isin)->orders.push_back(_order);
-}
-
-void Wallet::DeleteAllOrders()
-{
-	std::vector<Order> newOrders;
-	orders_ = newOrders;
 }
 
 std::string Wallet::TickerToIsin(const std::string& _ticker)
@@ -78,9 +60,4 @@ Asset* Wallet::GetAsset(const std::string& _isin)
 const std::vector<Asset>& Wallet::GetAssets() const
 {
 	return assets_;
-}
-
-const std::vector<Order>& Wallet::GetOrders() const
-{
-	return orders_;
 }

@@ -44,6 +44,7 @@ add_executable(MyWallet
 	src/main.cpp
 	src/app.cpp
 	src/wallet.cpp
+	src/order_manager.cpp
 	src/serializer.cpp
 	src/ui/ui_manager.cpp
 	src/ui/window.cpp

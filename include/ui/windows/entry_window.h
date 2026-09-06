@@ -10,7 +10,7 @@ struct NewOrderData
 	std::string ticker;
 	int day = 1, month = 1, year = 2000, hour = 0, minute = 0;
 	float quantity = 0;
-	float assetPosition = 0.0f;
+	float positionAfterTrade = 0.0f;
 };
 
 

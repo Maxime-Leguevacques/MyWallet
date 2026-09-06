@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "asset.h"
+#include "order.h"
 
 
 struct EntryOverview
@@ -20,8 +21,8 @@ public:
 	EntryOverview entryOverview;
 
 private:
+	int test;
 	std::vector<Asset> assets_;
-	std::vector<Order> orders_;
 
 public:
 	Wallet(const Wallet&) = delete;
@@ -30,17 +31,13 @@ public:
 
 	void AddAsset(const Asset& _asset);
 	void DeleteAsset(const Asset& _asset);
-	void DeleteAllAssets();
-
-	void AddOrder(const Order& _order);
-	void DeleteAllOrders();
+	void DeleteAssets();
 
 	static std::string TickerToIsin(const std::string& _ticker);
 	static std::string IsinToTicker(const std::string& _isin);
 
 	Asset* GetAsset(const std::string& _isin);
 	const std::vector<Asset>& GetAssets() const;
-	const std::vector<Order>& GetOrders() const;
 
 private:
 	Wallet() = default;

@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include "wallet.h"
+#include "order_manager.h"
 
 
 Serializer& Serializer::GetInstance()
@@ -84,12 +85,13 @@ void Serializer::SaveWallet(nlohmann::json& _json)
 
 	// orders
 	_json["orders"] = nlohmann::json::array();
-	const std::vector<Order>& orders = Wallet::GetInstance().GetOrders();
+	const std::vector<Order>& orders = OrderManager::GetInstance().GetOrders();
 	for (const Order& order : orders)
 	{
 		_json["orders"].push_back({
 			{ "isin", order.isin },
 			{ "quantity", order.quantity },
+			{ "position_after_trade", order.positionAfterTrade },
 			{ "day", order.day },
 			{ "month", order.month },
 			{ "year", order.year },
@@ -110,7 +112,7 @@ void Serializer::LoadWallet(const nlohmann::json& _json)
 	Wallet::GetInstance().entryOverview = eo;
 	
 	// assets
-	Wallet::GetInstance().DeleteAllAssets();
+	Wallet::GetInstance().DeleteAssets();
 	for (int i = 0; i < _json["assets"].size(); i++)
 	{
 		Asset asset;
@@ -122,17 +124,18 @@ void Serializer::LoadWallet(const nlohmann::json& _json)
 	}
 
 	// orders
-	Wallet::GetInstance().DeleteAllOrders();
+	OrderManager::GetInstance().DeleteOrders();
 	for (int i = 0; i < _json["orders"].size(); i++)
 	{
 		Order order;
 		order.isin = _json["orders"][i]["isin"];
 		order.quantity = _json["orders"][i]["quantity"];
+		order.positionAfterTrade = _json["orders"][i]["position_after_trade"];
 		order.day = _json["orders"][i]["day"];
 		order.month = _json["orders"][i]["month"];
 		order.year = _json["orders"][i]["year"];
 		order.hour = _json["orders"][i]["hour"];
 		order.minute = _json["orders"][i]["minute"];
-		Wallet::GetInstance().AddOrder(order);
+		OrderManager::GetInstance().AddOrder(order);
 	}
 }

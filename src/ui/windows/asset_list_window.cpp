@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "wallet.h"
+#include "order_manager.h"
 #include "ui/ui_manager.h"
 
 
@@ -71,10 +72,14 @@ void AssetListWindow::AssetListUpdate()
 		ImGui::Text("ticker    : %s", assets[i].ticker.c_str());
 		ImGui::Text("broker    : %s", assets[i].broker.c_str());
 		ImGui::Text("######################");
-		const std::vector<float>& positions = assets[i].positions;
-		float currentPosition = positions.size() > 0 ? positions[positions.size() - 1] : 0.0f;
-		ImGui::Text("position  : %.2f", currentPosition);
-		
+		std::vector<std::unordered_map<std::string, float>> walletPositions = OrderManager::GetInstance().GetWalletPositions();
+		if (walletPositions.empty())
+			ImGui::Text("position  : 0.0f");
+		else
+		{
+			std::unordered_map<std::string, float> lastPosition = walletPositions[walletPositions.size() - 1];
+			ImGui::Text("position  : %.2f", lastPosition[assets[i].isin]);
+		}
 		ImGui::PushID(i);
 		if (ImGui::Button("X"))
 			assetToDelete = i;

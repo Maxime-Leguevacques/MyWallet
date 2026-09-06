@@ -13,11 +13,13 @@ void OverviewWindow::UpdatePortfolioAssetChart()
 	std::vector<const char*> labels;
 	std::vector<float> values;
 
-	const auto& assets = Wallet::GetInstance().GetAssets();
-	labels.reserve(assets.size());
-	values.reserve(assets.size());
+	/*
+	std::vector<std::unordered_map<std::string, float>> walletPositions;
+	if (walletPositions.empty())
+		return;
+	
 
-	for (const Asset& asset : assets)
+	for (const auto& [isin, position] : OrderManager::GetWalletPositions())
 	{
 		labels.push_back(asset.ticker.c_str());
 		float position = asset.positions.empty() 
@@ -38,18 +40,9 @@ void OverviewWindow::UpdatePortfolioAssetChart()
 
 	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
 
-	if (ImPlot::BeginPlot(
-		"wallet distribution",
-		ImVec2(size, size),
-		ImPlotFlags_Equal
-	))
+	if (ImPlot::BeginPlot("wallet distribution", ImVec2(size, size), ImPlotFlags_Equal))
 	{
-		ImPlot::SetupAxes(
-			nullptr,
-			nullptr,
-			ImPlotAxisFlags_NoDecorations,
-			ImPlotAxisFlags_NoDecorations
-		);
+		ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_NoDecorations, ImPlotAxisFlags_NoDecorations);
 
 		ImPlot::SetupAxesLimits(0, 1, 0, 1);
 
@@ -65,11 +58,21 @@ void OverviewWindow::UpdatePortfolioAssetChart()
 		);
 
 		ImPlot::EndPlot();
-	}
+	}*/
 }
 
 void OverviewWindow::UpdatePortfolioGrowthChart()
 {
+	/*std::vector<float> positions;
+	std::vector<int> months;
+
+	// find longest positions
+	int longest = 0;
+	for (const Asset& asset : Wallet::GetInstance().GetAssets())
+		if (asset.positions.size() > longest)
+			longest = asset.positions[asset.positions.size() -1];
+
+
 	static const double x[] =
 	{
 		0.0, 1.0, 2.0, 3.0, 4.0,
@@ -79,7 +82,7 @@ void OverviewWindow::UpdatePortfolioGrowthChart()
 	static const double y[] =
 	{
 		1000.0, 1050.0, 1025.0, 1120.0, 1180.0,
-		1150.0, 1275.0, 1350.0, 1320.0, 1450.0
+		1150.0, 1275.0, 1350.0, 2.0, 2000.0
 	};
 
 	const int count = sizeof(x) / sizeof(x[0]);
@@ -107,7 +110,7 @@ void OverviewWindow::UpdatePortfolioGrowthChart()
 		);
 
 		ImPlot::EndPlot();
-	}
+	}*/
 }
 
 OverviewWindow::OverviewWindow(const std::string& _name)
