@@ -1,6 +1,4 @@
 # Philosophy
-Philosophy
-
 MyWallet is an opinionated investment tracker built for my own investment needs. Its goal is to remain simple to use and is meant for aspiring investors who follow my investment style (detailed below). I wanted to avoid creating a huge Excel sheet and preferred havin a small app to manage everything. This software is still a work in progress and prone to bugs; therefore, it shouldn't be treated as a professional investment tool.
 
 # Is it meant for you ?
