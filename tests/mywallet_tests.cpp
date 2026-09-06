@@ -20,8 +20,8 @@ void ResetState()
 
 void SeedAssets()
 {
-	Wallet::GetInstance().AddAsset({ "Asset A", "ISIN_A", "AAA", "Broker A" });
-	Wallet::GetInstance().AddAsset({ "Asset B", "ISIN_B", "BBB", "Broker B" });
+	Wallet::GetInstance().AddAsset({ .name = "Asset A", .isin = "ISIN_A", .ticker = "AAA", .broker = "Broker A", .positions = {} });
+	Wallet::GetInstance().AddAsset({ .name = "Asset B", .isin = "ISIN_B", .ticker = "BBB", .broker = "Broker B", .positions = {} });
 }
 }
 
@@ -33,8 +33,8 @@ int main()
 	assert(Wallet::TickerToIsin("AAA") == "ISIN_A");
 	assert(Wallet::IsinToTicker("ISIN_B") == "BBB");
 	assert(Wallet::TickerToIsin("UNKNOWN").empty());
-	assert(!Wallet::GetInstance().CanAddAsset({ "Asset C", "ISIN_A", "CCC", "Broker C" }));
-	assert(!Wallet::GetInstance().CanAddAsset({ "", "ISIN_C", "CCC", "Broker C" }));
+	assert(!Wallet::GetInstance().CanAddAsset({ .name = "Asset C", .isin = "ISIN_A", .ticker = "CCC", .broker = "Broker C", .positions = {} }));
+	assert(!Wallet::GetInstance().CanAddAsset({ .name = "", .isin = "ISIN_C", .ticker = "CCC", .broker = "Broker C", .positions = {} }));
 
 	// Order timeline and reset consistency
 	Order order1{ .isin = "ISIN_A", .quantity = 50.0f, .positionAfterTrade = 50.0f, .day = 1, .month = 1, .year = 2026, .hour = 10, .minute = 0 };

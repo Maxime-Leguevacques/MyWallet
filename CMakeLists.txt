@@ -39,6 +39,8 @@ endif()
 target_link_libraries(mywallet_core PRIVATE mywallet_warnings)
 
 if (MYWALLET_BUILD_APP)
+	set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "" FORCE)
+	set(GLFW_BUILD_X11 ON CACHE BOOL "" FORCE)
 	add_subdirectory(
 		external/glfw
 	)
