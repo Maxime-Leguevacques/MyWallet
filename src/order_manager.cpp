@@ -29,16 +29,6 @@ void OrderManager::AddOrder(const Order& _order)
 	}
 	else
 		walletPositions_.push_back({{ _order.isin, _order.positionAfterTrade }});
-	
-	for (int i = 0; i < walletPositions_.size(); i++)
-	{
-		std::cout << "{" << std::endl;
-		for (const auto& [isin, position] : walletPositions_[i])
-		{
-			std::cout << Wallet::GetInstance().IsinToTicker(isin) << " | " << position << std::endl;
-		}
-		std::cout << "}" << std::endl;
-	}
 }
 
 void OrderManager::DeleteOrders()
@@ -57,10 +47,9 @@ const std::vector<std::unordered_map<std::string, float>>& OrderManager::GetWall
 	return walletPositions_;
 }
 
-const std::unordered_map<std::string, float>& GetCurrentWalletPositions()
+const std::unordered_map<std::string, float>* OrderManager::GetCurrentWalletPositions() const
 {
-	std::unordered_map<std::string, float> currentPosition = {{"", 0.0f }};
-	if (!walletPositions_.empty())
-		currentPosition = walletPositions[walletPositions.size() - 1];
-	return currentPosition;
+	if (walletPositions_.empty())
+		return nullptr;
+	return &walletPositions_.back();
 }

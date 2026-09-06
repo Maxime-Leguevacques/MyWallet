@@ -6,29 +6,30 @@
 #include "implot.h"
 
 #include "wallet.h"
+#include "order_manager.h"
 
 
 void OverviewWindow::UpdatePortfolioAssetChart()
 {
+	std::vector<std::string> labelsStorage;
 	std::vector<const char*> labels;
 	std::vector<float> values;
-
-	/*
-	std::vector<std::unordered_map<std::string, float>> walletPositions;
-	if (walletPositions.empty())
-		return;
 	
+	const auto* cp = OrderManager::GetInstance().GetCurrentWalletPositions();    // current positions
 
-	for (const auto& [isin, position] : OrderManager::GetWalletPositions())
+	if (!cp || cp->empty())
+		return;
+
+	labelsStorage.reserve(cp->size());
+	labels.reserve(cp->size());
+	values.reserve(cp->size());
+
+	for (const auto& [isin, position] : *cp)
 	{
-		labels.push_back(asset.ticker.c_str());
-		float position = asset.positions.empty() 
-			? 0.0f
-			: asset.positions.back();
-
+		labelsStorage.push_back(Wallet::IsinToTicker(isin));
+		labels.push_back(labelsStorage.back().c_str());
 		values.push_back(static_cast<double>(position));
 	}
-
 
 	float width = ImGui::GetContentRegionAvail().x;
 
@@ -58,34 +59,31 @@ void OverviewWindow::UpdatePortfolioAssetChart()
 		);
 
 		ImPlot::EndPlot();
-	}*/
+	}
 }
 
 void OverviewWindow::UpdatePortfolioGrowthChart()
 {
-	/*std::vector<float> positions;
-	std::vector<int> months;
+	std::vector<float> positions;
+	std::vector<float> indices;
 
-	// find longest positions
-	int longest = 0;
-	for (const Asset& asset : Wallet::GetInstance().GetAssets())
-		if (asset.positions.size() > longest)
-			longest = asset.positions[asset.positions.size() -1];
+	const auto& wp = OrderManager::GetInstance().GetWalletPositions();
 
+	if (wp.empty()) 
+		return;
 
-	static const double x[] =
+	for (int i = 0; i < wp.size(); i++)
 	{
-		0.0, 1.0, 2.0, 3.0, 4.0,
-		5.0, 6.0, 7.0, 8.0, 9.0
-	};
+		float totalPosition = 0.0f;
+		for (const auto& [isin, position] : wp[i])
+			totalPosition += position;
+		positions.push_back(totalPosition);
+		indices.push_back(static_cast<float>(i));
+	}
 
-	static const double y[] =
-	{
-		1000.0, 1050.0, 1025.0, 1120.0, 1180.0,
-		1150.0, 1275.0, 1350.0, 2.0, 2000.0
-	};
 
-	const int count = sizeof(x) / sizeof(x[0]);
+	const int count = static_cast<int>(positions.size());
+
 
 	float width = ImGui::GetContentRegionAvail().x;
 	float height = std::min(ImGui::GetContentRegionAvail().y, 400.0f);
@@ -97,20 +95,20 @@ void OverviewWindow::UpdatePortfolioGrowthChart()
 	{
 		ImPlot::SetupAxes(
 			"Time",
-			"Banana Value",
+			"Wallet value",
 			ImPlotAxisFlags_None,
 			ImPlotAxisFlags_None
 		);
 
 		ImPlot::PlotLine(
-			"Banana",
-			x,
-			y,
+			"value",
+			indices.data(),
+			positions.data(),
 			count
 		);
 
 		ImPlot::EndPlot();
-	}*/
+	}
 }
 
 OverviewWindow::OverviewWindow(const std::string& _name)

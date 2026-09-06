@@ -23,7 +23,7 @@ public:
 	const std::vector<Order>& GetOrders() const;
 
 	const std::vector<std::unordered_map<std::string, float>>& GetWalletPositions() const;
-	const std::unordered_map<std::string, float>& GetCurrentWalletPositions() const;
+	const std::unordered_map<std::string, float>* GetCurrentWalletPositions() const;
 
 private:
 	OrderManager() = default;
