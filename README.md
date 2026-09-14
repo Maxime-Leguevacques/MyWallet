@@ -22,12 +22,12 @@ cmake --build build
 ```
 
 # Usage
-Once installed and built using CMake, go to MyWallet/build and run ./MyWallet
-This will launch the application.
-As of right now, you can use the 2 tabs: dashboard and assets.
-Before adding any orders, you need to first create an asset. Navigate to the asset section and click on the 'new asset' button. Fill in each section and press the 'add' button. Press 'S' to save.
-Once an asset is added, you can create an order for it by going back to the dashboard section. Click on the 'new order' button and fill in each section. When done, press the 'add' button. Your order will now appear. Press 'S' to save.
-
+Once installed and built using CMake, go to MyWallet/build and run ./MyWallet.  
+This will launch the application.  
+As of right now, you can use the 2 tabs: dashboard and assets.  
+Before adding any orders, you need to first create an asset. Navigate to the asset section and click on the 'new asset' button. Fill in each section and press the 'add' button. Press 'S' to save.  
+Once an asset is added, you can create an order for it by going back to the dashboard section. Click on the 'new order' button and fill in each section. When done, press the 'add' button. Your order will now appear. Press 'S' to save.  
+  
 Press 'H' to toggle the help menu.
 
 # ROADMAP
