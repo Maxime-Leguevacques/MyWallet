@@ -10,10 +10,24 @@ MyWallet was made in order to help me keep track of my investment strategy, so i
 The features of MyWallet revolve around these following points, so if you do not see your strategy in mine, this tool might not be meant for you. However, if your investment strategy does align with mine, then MyWallet should be worth a try. There is also a roadmap written below to show what I plan to work on, which could include features you are looking for.
 
 # Installation 
-TODO
+- Arch Linux Hyprland setup
+Prerquisits: CMake, clang++ 22.1.8
+
+```bash
+git@github.com:Maxime-Leguevacques/MyWallet.git
+cd MyWallet
+cmake -B build
+cmake --build build
+```
 
 # Usage
-TODO
+Once installed and built using CMake, go to MyWallet/build and run ./MyWallet
+This will launch the application.
+As of right now, you can use the 2 tabs: dashboard and assets.
+Before adding any orders, you need to first create an asset. Navigate to the asset section and click on the 'new asset' button. Fill in each section and press the 'add' button. Press 'S' to save.
+Once an asset is added, you can create an order for it by going back to the dashboard section. Click on the 'new order' button and fill in each section. When done, press the 'add' button. Your order will now appear. Press 'S' to save.
+
+Press 'H' to toggle the help menu.
 
 # ROADMAP
 - [ ] better and safer save system
