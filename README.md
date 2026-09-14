@@ -10,7 +10,7 @@ MyWallet was made in order to help me keep track of my investment strategy, so i
 The features of MyWallet revolve around these following points, so if you do not see your strategy in mine, this tool might not be meant for you. However, if your investment strategy does align with mine, then MyWallet should be worth a try. There is also a roadmap written below to show what I plan to work on, which could include features you are looking for.
 
 # Installation 
-- Arch Linux Hyprland setup
+- Arch Linux Hyprland setup  
 Prerquisits: CMake, clang++ 22.1.8
 
 ```bash
