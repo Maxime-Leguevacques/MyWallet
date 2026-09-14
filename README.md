@@ -11,6 +11,7 @@ The features of MyWallet revolve around these following points, so if you do not
 
 # Installation 
 - Arch Linux Hyprland setup  
+
 Prerquisits: CMake, clang++ 22.1.8
 
 ```bash
