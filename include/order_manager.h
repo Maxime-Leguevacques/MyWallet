@@ -12,6 +12,7 @@ class OrderManager
 private:
 	std::vector<Order> orders_;
 	std::vector<std::unordered_map<std::string, float>> walletPositions_;
+	std::vector<float> walletInvestments_;
 
 public:
 	OrderManager(const OrderManager&) = delete;

@@ -36,6 +36,8 @@ void OrderManager::AddOrder(const Order& _order)
 	}
 	else
 		walletPositions_.push_back({{ _order.isin, _order.positionAfterTrade }});
+
+	walletInvestments_.push_back(_order.quantity);
 }
 
 void OrderManager::DeleteOrders()

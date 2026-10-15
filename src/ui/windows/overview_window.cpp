@@ -65,6 +65,7 @@ void OverviewWindow::UpdatePortfolioAssetChart()
 void OverviewWindow::UpdatePortfolioGrowthChart()
 {
 	std::vector<float> positions;
+	std::vector<float> investments;
 	std::vector<float> indices;
 
 	const auto& wp = OrderManager::GetInstance().GetWalletPositions();
@@ -81,6 +82,15 @@ void OverviewWindow::UpdatePortfolioGrowthChart()
 		indices.push_back(static_cast<float>(i));
 	}
 
+	const auto& orders = OrderManager::GetInstance().GetOrders();
+	float investmentQuantity = 0.0f;
+	for (const Order& o : orders)
+	{
+		const float q = o.quantity;
+		investmentQuantity += q;
+		investments.push_back(investmentQuantity);
+	}
+
 
 	const int count = static_cast<int>(positions.size());
 
@@ -88,24 +98,12 @@ void OverviewWindow::UpdatePortfolioGrowthChart()
 	float width = ImGui::GetContentRegionAvail().x;
 	float height = std::min(ImGui::GetContentRegionAvail().y, 400.0f);
 
-	if (ImPlot::BeginPlot(
-		"Banane Growth",
-		ImVec2(width, height)
-	))
+	if (ImPlot::BeginPlot("Wallet Growth", ImVec2(width, height)))
 	{
-		ImPlot::SetupAxes(
-			"Time",
-			"Wallet value",
-			ImPlotAxisFlags_None,
-			ImPlotAxisFlags_None
-		);
+		ImPlot::SetupAxes("Time", "Value", ImPlotAxisFlags_None, ImPlotAxisFlags_None);
 
-		ImPlot::PlotLine(
-			"value",
-			indices.data(),
-			positions.data(),
-			count
-		);
+		ImPlot::PlotLine("Wallet Value", indices.data(), positions.data(), count);
+		ImPlot::PlotLine("Wallet Investment", indices.data(), investments.data(), count);
 
 		ImPlot::EndPlot();
 	}
